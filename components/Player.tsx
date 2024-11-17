@@ -86,7 +86,6 @@ const Player = () => {
                                             alignItems: "center",
                                         }}
                                     >
-                                        {/* Track title */}
                                         <View
                                             style={styles.trackTitleContainer}
                                         >
@@ -114,7 +113,7 @@ const Player = () => {
                                                 </Text>
                                             )}
                                         </View>
-                                        {/* Favorite and repeat button icon */}
+
                                         <View
                                             style={{
                                                 flexDirection: "row",
@@ -133,7 +132,6 @@ const Player = () => {
                                             </View>
                                         </View>
                                     </View>
-                                    {/* Track artist */}
                                     {activeTrack.artist?.length &&
                                     activeTrack.artist?.length > 30 ? (
                                         <Marquee spacing={150} speed={1}>
@@ -225,17 +223,6 @@ const DismissPlayerSymbol = () => {
             }}
         >
             <TouchableOpacity onPress={() => router.goBack()}>
-                {/* <View
-                    style={{
-                        width: 25,
-                        height: 25,
-                        borderLeftWidth: 8,
-                        borderBottomWidth: 8,
-                        borderColor: "#aaa",
-                        opacity: 0.7,
-                        transform: [{ rotate: "-45deg" }],
-                    }}
-                /> */}
                 <AntDesign
                     name="down"
                     size={50}

@@ -19,7 +19,7 @@ const ItemDivider = () => (
 export const TracksList = ({ tracks, ...flatlistProps }: TracksListProps) => {
     const { play, setVolume } = useSoundStore();
     const handleTrackSelect = async (track: Track) => {
-        await play(track);
+        await play(track, tracks);
         setVolume(1);
     };
 

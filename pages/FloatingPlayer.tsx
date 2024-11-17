@@ -1,4 +1,8 @@
-import { PlayPauseButton, SkipToNextButton } from "./PlayerControls";
+import {
+    PlayPauseButton,
+    SkipToNextButton,
+    SkipToPreviousButton,
+} from "./PlayerControls";
 import {
     StyleSheet,
     TouchableOpacity,
@@ -62,6 +66,7 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
                     )}
                 </View>
                 <View style={styles.trackControlsContainer}>
+                    <SkipToPreviousButton iconSize={22} />
                     <PlayPauseButton iconSize={24} />
                     <SkipToNextButton iconSize={22} />
                 </View>

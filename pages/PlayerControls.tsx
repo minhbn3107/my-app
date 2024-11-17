@@ -1,5 +1,10 @@
 import { useSoundStore } from "../hooks/useSoundStore";
-import { FontAwesome6, FontAwesome, Entypo } from "@expo/vector-icons";
+import {
+    FontAwesome6,
+    FontAwesome,
+    Entypo,
+    MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
 type PlayerControlsProps = {
     style?: ViewStyle;
@@ -22,12 +27,18 @@ export const PlayerControls = ({ style }: PlayerControlsProps) => {
     );
 };
 export const ShuttleButton = ({ iconSize = 30 }: PlayerButtonProps) => {
+    const { isShuffled, toggleShuffle } = useSoundStore();
     return (
-        <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => console.log("random")}
-        >
-            <FontAwesome name="random" size={iconSize} color="#fff" />
+        <TouchableOpacity activeOpacity={0.7} onPress={() => toggleShuffle()}>
+            {isShuffled ? (
+                <FontAwesome name="random" size={iconSize} color="#fff" />
+            ) : (
+                <MaterialCommunityIcons
+                    name="shuffle-disabled"
+                    size={iconSize}
+                    color="#fff"
+                />
+            )}
         </TouchableOpacity>
     );
 };
@@ -52,22 +63,38 @@ export const PlayPauseButton = ({
     );
 };
 export const SkipToNextButton = ({ iconSize = 30 }: PlayerButtonProps) => {
+    const { next, canNext, isLoading } = useSoundStore();
+
     return (
         <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => console.log("skip to next")}
+            onPress={() => canNext && !isLoading && next()}
+            disabled={!canNext || isLoading}
+            style={{ opacity: canNext && !isLoading ? 1 : 0.5 }}
         >
-            <FontAwesome6 name="forward" size={iconSize} color="#fff" />
+            <FontAwesome6
+                name="forward"
+                size={iconSize}
+                color={canNext && !isLoading ? "#fff" : "#666"}
+            />
         </TouchableOpacity>
     );
 };
 export const SkipToPreviousButton = ({ iconSize = 30 }: PlayerButtonProps) => {
+    const { previous, canPrevious, isLoading } = useSoundStore();
+
     return (
         <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => console.log("skip to previous")}
+            onPress={() => canPrevious && !isLoading && previous()}
+            disabled={!canPrevious || isLoading}
+            style={{ opacity: canPrevious && !isLoading ? 1 : 0.5 }}
         >
-            <FontAwesome6 name={"backward"} size={iconSize} color="#fff" />
+            <FontAwesome6
+                name="backward"
+                size={iconSize}
+                color={canPrevious && !isLoading ? "#fff" : "#666"}
+            />
         </TouchableOpacity>
     );
 };

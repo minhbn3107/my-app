@@ -1,166 +1,18 @@
-// import { create } from "zustand";
-// import SoundPlayer from "react-native-sound-player";
-
-// export interface Track {
-//     url: string;
-//     title: string;
-//     artist?: string;
-//     artwork?: string;
-//     playlist?: string[];
-// }
-
-// interface SoundState {
-//     isPlaying: boolean;
-//     volume: number;
-//     loops: number;
-//     speed: number;
-//     activeTrack: Track | null;
-//     play: (track: Track) => Promise<void>;
-//     pause: () => Promise<void>;
-//     resume: () => Promise<void>;
-//     setLoops: (newLoop: number) => void;
-//     setVolume: (volume: number) => void;
-//     setActiveTrack: (track: Track) => void;
-//     onFinishedPlaying: () => void;
-// }
-
-// export const loopOrder: number[] = [0, 1, -1];
-
-// const logAction = (action: string, details?: any) => {
-//     const timestamp = new Date().toISOString();
-//     console.log(
-//         `[Sound Player ${timestamp}] ${action}`,
-//         details ? details : ""
-//     );
-// };
-
-// // Initialize event listeners
-// const initializeSoundPlayer = () => {
-//     try {
-//         // Finish playing event
-//         SoundPlayer.addEventListener("FinishedPlaying", ({ success }) => {
-//             logAction("Finished playing", { success });
-//             const { onFinishedPlaying } = useSoundStore.getState();
-//             onFinishedPlaying();
-//         });
-
-//         // Error event
-//         SoundPlayer.addEventListener(
-//             "FinishedLoadingURL",
-//             ({ success, url }) => {
-//                 logAction("Finished loading URL", { success, url });
-//             }
-//         );
-//     } catch (error) {
-//         console.error("Failed to initialize sound player:", error);
-//     }
-// };
-
-// export const useSoundStore = create<SoundState>((set, get) => ({
-//     isPlaying: false,
-//     volume: 1,
-//     loops: 0,
-//     speed: 1,
-//     activeTrack: null,
-
-//     play: async (track: Track) => {
-//         try {
-//             logAction("Starting playback", { url: track.url });
-
-//             // Stop any currently playing audio
-//             await SoundPlayer.stop();
-
-//             // Load and play the new track
-//             await SoundPlayer.loadUrl(track.url);
-
-//             // Set volume
-//             SoundPlayer.setVolume(get().volume);
-
-//             // Handle looping
-//             if (get().loops === -1) {
-//                 SoundPlayer.setNumberOfLoops(0);
-//             } else {
-//                 SoundPlayer.play();
-//             }
-
-//             // Update state
-//             set({ activeTrack: track, isPlaying: true });
-//             logAction("Playback started", { url: track.url });
-//         } catch (error) {
-//             logAction("Playback failed", { url: track.url, error });
-//             console.error("Failed to play sound:", error);
-//         }
-//     },
-
-//     pause: async () => {
-//         try {
-//             logAction("Pausing playback");
-//             await SoundPlayer.pause();
-//             set({ isPlaying: false });
-//             logAction("Playback paused");
-//         } catch (error) {
-//             logAction("Failed to pause playback", { error });
-//             console.error("Failed to pause sound:", error);
-//         }
-//     },
-
-//     resume: async () => {
-//         try {
-//             logAction("Resuming playback");
-//             SoundPlayer.setVolume(get().volume);
-//             await SoundPlayer.resume();
-//             set({ isPlaying: true });
-//             logAction("Playback resumed");
-//         } catch (error) {
-//             logAction("Failed to resume playback", { error });
-//             console.error("Failed to resume sound:", error);
-//         }
-//     },
-
-//     setLoops: (newLoop: number) => {
-//         set({ loops: newLoop });
-//     },
-
-//     setVolume: async (newVolume: number) => {
-//         logAction("Volume changed", {
-//             previousVolume: get().volume,
-//             newVolume,
-//         });
-//         set({ volume: newVolume });
-//         SoundPlayer.setVolume(newVolume);
-//     },
-
-//     setActiveTrack: (track: Track) => set({ activeTrack: track }),
-
-//     onFinishedPlaying: () => {
-//         const { loops, setLoops } = get();
-//         if (loops === 1) {
-//             setLoops(0);
-//             SoundPlayer.play();
-//         } else if (loops === -1) {
-//             SoundPlayer.play();
-//         }
-//     },
-// }));
-
-// // Initialize sound player when the store is created
-// initializeSoundPlayer();
-
-// // Clean up function to remove event listeners
-// export const cleanup = () => {
-//     SoundPlayer.unmount();
-// };
-import { create } from "zustand";
-import { Audio } from "expo-av";
-
 export type Track = {
     url: string;
     title: string;
     artist?: string;
     artwork?: string;
     rating?: number;
-    playlist: string[];
+    playlist?: string[];
 };
+
+export interface PlayerButtonProps {
+    iconSize?: number;
+}
+
+import { create } from "zustand";
+import { Audio } from "expo-av";
 
 interface SoundState {
     isPlaying: boolean;
@@ -172,40 +24,63 @@ interface SoundState {
     positionMillis: number;
     isLooping: boolean;
     isLoading: boolean;
-    play: (track: Track) => Promise<void>;
+    queue: Track[];
+    originalQueue: Track[];
+    currentTrackIndex: number;
+    canNext: boolean;
+    canPrevious: boolean;
+    isShuffled: boolean;
+    play: (track: Track, playlist?: Track[]) => Promise<void>;
     pause: () => Promise<void>;
     resume: () => Promise<void>;
     seek: (seconds: number) => Promise<void>;
     setLoops: (newLoop: number) => void;
     setVolume: (volume: number) => void;
     setActiveTrack: (track: Track) => void;
+    next: () => Promise<void>;
+    previous: () => Promise<void>;
+    addToQueue: (track: Track) => void;
+    removeFromQueue: (index: number) => void;
+    clearQueue: () => void;
+    updateNavigationState: () => void;
+    toggleShuffle: () => void;
 }
 
-export const loopOrder: number[] = [0, 1, -1];
 let playingNow = false;
-export let sound: Audio.Sound | null = null;
+let sound: Audio.Sound | null = null;
 
 const unloadSound = async () => {
     if (sound) {
-        console.log("Unloading sound...");
+        console.log("🔄 Unloading sound...");
         await sound.unloadAsync();
         sound = null;
     }
 };
 
-const initializeSoundPlayer = () => {
-    if (sound) {
-        sound.setOnPlaybackStatusUpdate((status) => {
-            if (status.isLoaded) {
-                useSoundStore.setState({
-                    duration: status.durationMillis! / 1000,
-                    positionMillis: status.positionMillis / 1000,
-                    isLooping: status.isLooping,
-                    isLoading: status.isLoaded,
-                });
-            }
-        });
+const createNewSound = async (
+    trackUrl: string,
+    volume: number,
+    isLooping: boolean
+): Promise<Audio.Sound> => {
+    const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: trackUrl },
+        { volume, shouldPlay: true, isLooping }
+    );
+    return newSound;
+};
+
+const shuffleArray = (array: Track[]): Track[] => {
+    if (!array || array.length <= 1) return array;
+
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+
+        const temp = shuffled[i];
+        shuffled[i] = shuffled[j];
+        shuffled[j] = temp;
     }
+    return shuffled;
 };
 
 export const useSoundStore = create<SoundState>((set, get) => ({
@@ -218,41 +93,225 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     positionMillis: 0,
     isLooping: false,
     isLoading: false,
+    queue: [],
+    originalQueue: [],
+    currentTrackIndex: -1,
+    canNext: false,
+    canPrevious: false,
+    isShuffled: false,
 
-    play: async (track: Track) => {
-        if (playingNow) return;
+    updateNavigationState: () => {
+        const { queue, currentTrackIndex } = get();
+        const canNext = currentTrackIndex < queue.length - 1;
+        const canPrevious = currentTrackIndex > 0;
 
-        playingNow = true;
-        console.log("Attempting to play track:", track);
-        try {
-            await unloadSound();
-            const { sound: newSound } = await Audio.Sound.createAsync(
-                { uri: track.url },
-                {
-                    volume: get().volume,
-                    shouldPlay: true,
-                    isLooping: get().loops === -1,
-                }
+        set({ canNext, canPrevious });
+        console.log(
+            `🚦 Navigation state - Next: ${canNext}, Previous: ${canPrevious}`
+        );
+    },
+
+    toggleShuffle: () => {
+        const { queue, originalQueue, activeTrack, isShuffled } = get();
+
+        if (!isShuffled) {
+            const originalQueueToSave = isShuffled ? originalQueue : [...queue];
+
+            const currentTrackIndex = queue.findIndex(
+                (track) => track.url === activeTrack?.url
             );
-            sound = newSound;
+            const remainingTracks = queue.filter(
+                (_, index) => index !== currentTrackIndex
+            );
+            const shuffledRemaining = shuffleArray(remainingTracks);
 
-            if (get().loops === 1) {
-                sound.setIsLoopingAsync(false);
+            const newQueue = [...shuffledRemaining];
+            if (currentTrackIndex !== -1) {
+                newQueue.splice(currentTrackIndex, 0, queue[currentTrackIndex]);
             }
 
-            initializeSoundPlayer();
-            set({ activeTrack: track, isPlaying: true });
-            console.log("Playing track:", track.title);
+            console.log("🎲 Shuffle enabled");
+            set({
+                queue: newQueue,
+                originalQueue: originalQueueToSave,
+                isShuffled: true,
+                currentTrackIndex: currentTrackIndex,
+            });
+        } else {
+            console.log("🎲 Shuffle disabled");
+            const currentTrackIndex = originalQueue.findIndex(
+                (track) => track.url === activeTrack?.url
+            );
+            set({
+                queue: [...originalQueue],
+                isShuffled: false,
+                currentTrackIndex: currentTrackIndex,
+            });
+        }
+
+        get().updateNavigationState();
+    },
+
+    play: async (track: Track, playlist?: Track[]) => {
+        if (playingNow) {
+            console.log("⚠️ Already playing");
+            return;
+        }
+
+        playingNow = true;
+        console.log("▶️ Playing:", track.title);
+
+        try {
+            await unloadSound();
+            sound = await createNewSound(
+                track.url,
+                get().volume,
+                get().loops === -1
+            );
+
+            if (sound) {
+                sound.setOnPlaybackStatusUpdate((status) => {
+                    if (status.isLoaded) {
+                        const currentLoops = get().loops;
+
+                        set({
+                            duration: status.durationMillis! / 1000,
+                            positionMillis: status.positionMillis / 1000,
+                            isLooping: status.isLooping,
+                            isLoading: false,
+                        });
+
+                        if (status.didJustFinish) {
+                            console.log("🎵 Track finished");
+
+                            if (currentLoops === 1) {
+                                console.log(
+                                    "🔄 Single loop completed, disabling loops"
+                                );
+                                set({ loops: 0 });
+                                sound?.setIsLoopingAsync(false);
+                            }
+
+                            if (!status.isLooping) {
+                                const state = get();
+                                if (state.canNext) {
+                                    state.next();
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (playlist) {
+                    const trackIndex = playlist.findIndex(
+                        (t) => t.url === track.url
+                    );
+                    console.log(
+                        `📋 Queue: ${playlist.length} tracks, index: ${trackIndex}`
+                    );
+                    set({
+                        queue: playlist,
+                        originalQueue: [...playlist],
+                        currentTrackIndex: Math.max(0, trackIndex),
+                        activeTrack: track,
+                        isPlaying: true,
+                        isLoading: false,
+                        isShuffled: false,
+                    });
+                } else {
+                    console.log("📌 Single track mode");
+                    set({
+                        queue: [track],
+                        originalQueue: [track],
+                        currentTrackIndex: 0,
+                        activeTrack: track,
+                        isPlaying: true,
+                        isLoading: false,
+                        isShuffled: false,
+                    });
+                }
+
+                get().updateNavigationState();
+            }
         } catch (error) {
-            console.error("Failed to play sound:", error);
+            console.error("❌ Playback error:", error);
+            set({ isLoading: false });
         } finally {
-            playingNow = false; // Unlock play action
+            playingNow = false;
+        }
+    },
+
+    next: async () => {
+        const { queue, currentTrackIndex, canNext } = get();
+        if (!canNext) {
+            console.log("⚠️ No next track available");
+            return;
+        }
+
+        const nextIndex = currentTrackIndex + 1;
+        const nextTrack = queue[nextIndex];
+        console.log(`⏭️ Next track: ${nextTrack.title}`);
+
+        try {
+            set({ isLoading: true });
+            await unloadSound();
+            sound = await createNewSound(
+                nextTrack.url,
+                get().volume,
+                get().loops === -1
+            );
+
+            set({
+                currentTrackIndex: nextIndex,
+                activeTrack: nextTrack,
+                isPlaying: true,
+                isLoading: false,
+            });
+
+            get().updateNavigationState();
+        } catch (error) {
+            console.error("❌ Next track error:", error);
+            set({ isLoading: false });
+        }
+    },
+
+    previous: async () => {
+        const { queue, currentTrackIndex, canPrevious } = get();
+        if (!canPrevious) {
+            console.log("⚠️ No previous track available");
+            return;
+        }
+
+        const previousIndex = currentTrackIndex - 1;
+        const previousTrack = queue[previousIndex];
+        console.log(`⏮️ Previous track: ${previousTrack.title}`);
+
+        try {
+            set({ isLoading: true });
+            await unloadSound();
+            sound = await createNewSound(
+                previousTrack.url,
+                get().volume,
+                get().loops === -1
+            );
+
+            set({
+                currentTrackIndex: previousIndex,
+                activeTrack: previousTrack,
+                isPlaying: true,
+                isLoading: false,
+            });
+
+            get().updateNavigationState();
+        } catch (error) {
+            console.error("❌ Previous track error:", error);
+            set({ isLoading: false });
         }
     },
 
     pause: async () => {
         if (sound) {
-            console.log("Pausing sound...");
+            console.log("⏸️ Paused");
             await sound.pauseAsync();
             set({ isPlaying: false });
         }
@@ -260,7 +319,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     resume: async () => {
         if (sound) {
-            console.log("Resuming sound...");
+            console.log("▶️ Resumed");
             await sound.playAsync();
             set({ isPlaying: true });
         }
@@ -268,14 +327,14 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     seek: async (seconds: number) => {
         if (sound) {
-            console.log(`Seeking to ${seconds} seconds...`);
+            console.log(`⏩ Seek: ${seconds}s`);
             await sound.setPositionAsync(seconds * 1000);
             set({ positionMillis: seconds });
         }
     },
 
     setLoops: (newLoop: number) => {
-        console.log("Setting loop mode to:", newLoop);
+        console.log("🔁 Loop mode:", newLoop);
         set({ loops: newLoop });
         if (sound) {
             sound.setIsLoopingAsync(newLoop === -1 || newLoop === 1);
@@ -283,7 +342,7 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     },
 
     setVolume: (newVolume: number) => {
-        console.log("Setting volume to:", newVolume);
+        console.log("🔊 Volume:", newVolume);
         set({ volume: newVolume });
         if (sound) {
             sound.setVolumeAsync(newVolume);
@@ -291,7 +350,49 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     },
 
     setActiveTrack: (track: Track) => {
-        console.log("Setting active track:", track);
+        console.log("📌 Active track:", track.title);
         set({ activeTrack: track });
+    },
+
+    addToQueue: (track: Track) => {
+        console.log("📝 Queue add:", track.title);
+        set((state) => ({
+            queue: [...state.queue, track],
+            originalQueue: [...state.originalQueue, track],
+        }));
+        get().updateNavigationState();
+    },
+
+    removeFromQueue: (index: number) => {
+        console.log("🗑️ Queue remove index:", index);
+        set((state) => {
+            const newQueue = [...state.queue];
+            const newOriginalQueue = [...state.originalQueue];
+            newQueue.splice(index, 1);
+            newOriginalQueue.splice(index, 1);
+
+            const newIndex =
+                index < state.currentTrackIndex
+                    ? state.currentTrackIndex - 1
+                    : state.currentTrackIndex;
+
+            return {
+                queue: newQueue,
+                originalQueue: newOriginalQueue,
+                currentTrackIndex: Math.min(newIndex, newQueue.length - 1),
+            };
+        });
+        get().updateNavigationState();
+    },
+
+    clearQueue: () => {
+        console.log("🧹 Queue cleared");
+        set({
+            queue: [],
+            originalQueue: [],
+            currentTrackIndex: -1,
+            isShuffled: false,
+        });
+        get().updateNavigationState();
     },
 }));

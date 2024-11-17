@@ -1,4 +1,4 @@
-import { loopOrder, useSoundStore } from "../hooks/useSoundStore";
+import { useSoundStore } from "../hooks/useSoundStore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { match } from "ts-pattern";

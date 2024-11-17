@@ -1,9 +1,13 @@
-import { Image, ScrollView, StyleSheet, Text, TextInput, TextInputBase, TouchableOpacity, View } from 'react-native'
-import React from 'react'
-
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faCirclePlay } from '@fortawesome/free-solid-svg-icons/faCirclePlay'
-
+import {
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faCirclePlay } from "@fortawesome/free-solid-svg-icons/faCirclePlay";
 
 const ARRAY_LIST_TOP_ARTIST = [
     {
@@ -19,28 +23,24 @@ const ARRAY_LIST_TOP_ARTIST = [
     {
         id: 3,
         image: "https://i.ibb.co/4Z3WfmH/2.jpg",
-        name: "Para Moule"
+        name: "Para Moule",
     },
     {
         id: 4,
         image: "https://i.ibb.co/qYdWKbP/6.jpg",
-        name: "Para Moule"
+        name: "Para Moule",
     },
     {
         id: 5,
         image: "https://i.ibb.co/nrmJH8F/5.jpg",
-        name: "Para Moule"
+        name: "Para Moule",
     },
-]
-
-
-
+];
 
 const HomePage = () => {
-
     return (
         <View style={styles.container}>
-            <ScrollView style={{ padding: 10, }}>
+            <ScrollView style={{ padding: 10 }}>
                 <View>
                     <Text style={styles.text_heading}>TOP Artist</Text>
                     <ScrollView
@@ -50,23 +50,71 @@ const HomePage = () => {
                     >
                         {ARRAY_LIST_TOP_ARTIST.map((item) => {
                             return (
-                                <TouchableOpacity key={item.id} style={styles.itemtopAr}>
-                                    <Image source={{ uri: item.image }} style={styles.imageTop} />
-                                    <Text style={{ textAlign: "center", fontWeight: "500" }}>{item.name}</Text>
+                                <TouchableOpacity
+                                    key={item.id}
+                                    style={styles.itemtopAr}
+                                >
+                                    <Image
+                                        source={{ uri: item.image }}
+                                        style={styles.imageTop}
+                                    />
+                                    <Text
+                                        style={{
+                                            textAlign: "center",
+                                            fontWeight: "500",
+                                        }}
+                                    >
+                                        {item.name}
+                                    </Text>
                                 </TouchableOpacity>
-                            )
+                            );
                         })}
                     </ScrollView>
                 </View>
                 <View style={{ marginTop: 15 }}>
                     <Text style={styles.text_heading}>New Album</Text>
                     <View style={{ position: "relative" }}>
-                        <Image source={{ uri: "https://i.ibb.co/8rn2GGf/new-ab1.webp" }} style={styles.imgnewAb} />
-                        <View style={{ height: "100%", position: "absolute", top: 0, justifyContent: "flex-end" }}>
-                            <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-between", padding: 15 }}>
+                        <Image
+                            source={{
+                                uri: "https://i.ibb.co/8rn2GGf/new-ab1.webp",
+                            }}
+                            style={styles.imgnewAb}
+                        />
+                        <View
+                            style={{
+                                height: "100%",
+                                position: "absolute",
+                                top: 0,
+                                justifyContent: "flex-end",
+                            }}
+                        >
+                            <View
+                                style={{
+                                    width: "100%",
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                    padding: 15,
+                                }}
+                            >
                                 <View>
-                                    <Text style={{ fontSize: 17, fontWeight: "500", color: "#fff" }}>Listen to best music today</Text>
-                                    <Text style={{ fontSize: 15, fontWeight: "500", color: "#fff" }}>12.00 - 114.00 MB</Text>
+                                    <Text
+                                        style={{
+                                            fontSize: 17,
+                                            fontWeight: "500",
+                                            color: "#fff",
+                                        }}
+                                    >
+                                        Listen to best music today
+                                    </Text>
+                                    <Text
+                                        style={{
+                                            fontSize: 15,
+                                            fontWeight: "500",
+                                            color: "#fff",
+                                        }}
+                                    >
+                                        12.00 - 114.00 MB
+                                    </Text>
                                 </View>
                                 <View>
                                     <TouchableOpacity style={styles.btnPlay}>
@@ -78,7 +126,6 @@ const HomePage = () => {
                     </View>
                 </View>
 
-
                 <View style={{ marginTop: 15 }}>
                     <Text style={styles.text_heading}>Recently Played</Text>
                     <ScrollView
@@ -89,20 +136,44 @@ const HomePage = () => {
                         {ARRAY_LIST_TOP_ARTIST.map((item) => {
                             return (
                                 <View key={item.id} style={styles.itemRP}>
-                                    <Image source={{ uri: item.image }} style={styles.imageRP} />
-                                    <Text style={{ textAlign: "left", fontWeight: "600", fontSize: 16 }}>{item.name}</Text>
-                                    <View style={{ width: "100%", height: "100%", position: "absolute", top: 0, justifyContent: "center", alignItems: "center" }}>
-                                        <TouchableOpacity style={styles.btnPlay}>
-                                            <FontAwesomeIcon icon={faCirclePlay} />
+                                    <Image
+                                        source={{ uri: item.image }}
+                                        style={styles.imageRP}
+                                    />
+                                    <Text
+                                        style={{
+                                            textAlign: "left",
+                                            fontWeight: "600",
+                                            fontSize: 16,
+                                        }}
+                                    >
+                                        {item.name}
+                                    </Text>
+                                    <View
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            position: "absolute",
+                                            top: 0,
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <TouchableOpacity
+                                            style={styles.btnPlay}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faCirclePlay}
+                                            />
                                         </TouchableOpacity>
                                     </View>
                                 </View>
-                            )
+                            );
                         })}
                     </ScrollView>
                 </View>
 
-                <View style={{ marginTop: 15, marginBottom:99 }}>
+                <View style={{ marginTop: 15, marginBottom: 99 }}>
                     <Text style={styles.text_heading}>Active Played</Text>
                     <ScrollView
                         horizontal
@@ -112,30 +183,48 @@ const HomePage = () => {
                         {ARRAY_LIST_TOP_ARTIST.map((item) => {
                             return (
                                 <View key={item.id} style={styles.itemRP}>
-                                    <Image source={{ uri: item.image }} style={styles.imageRP} />
-                                    <Text style={{ textAlign: "left", fontWeight: "600", fontSize: 16 }}>{item.name}</Text>
-                                    <View style={{ width: "100%", height: "100%", position: "absolute", top: 0, justifyContent: "center", alignItems: "center" }}>
-                                        <TouchableOpacity style={styles.btnPlay}>
-                                            <FontAwesomeIcon icon={faCirclePlay} />
+                                    <Image
+                                        source={{ uri: item.image }}
+                                        style={styles.imageRP}
+                                    />
+                                    <Text
+                                        style={{
+                                            textAlign: "left",
+                                            fontWeight: "600",
+                                            fontSize: 16,
+                                        }}
+                                    >
+                                        {item.name}
+                                    </Text>
+                                    <View
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            position: "absolute",
+                                            top: 0,
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <TouchableOpacity
+                                            style={styles.btnPlay}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faCirclePlay}
+                                            />
                                         </TouchableOpacity>
                                     </View>
                                 </View>
-                            )
+                            );
                         })}
                     </ScrollView>
                 </View>
-
-
-
-
-
-
             </ScrollView>
-        </View >
-    )
-}
+        </View>
+    );
+};
 
-export default HomePage
+export default HomePage;
 
 const styles = StyleSheet.create({
     container: {
@@ -145,23 +234,20 @@ const styles = StyleSheet.create({
     text_heading: {
         fontSize: 19,
         fontWeight: "600",
-        marginTop: 10
+        marginTop: 10,
     },
 
     lineTopAr: {
-        flexDirection: "row"
+        flexDirection: "row",
     },
     itemtopAr: {
-        margin: 10
+        margin: 10,
     },
     imageTop: {
         width: 60,
         height: 60,
         borderRadius: 100,
-        
     },
-
-
 
     imgnewAb: {
         width: "100%",
@@ -169,7 +255,7 @@ const styles = StyleSheet.create({
         objectFit: "cover",
         borderRadius: 15,
         marginTop: 10,
-        opacity:0.9
+        opacity: 0.9,
     },
 
     btnPlay: {
@@ -180,14 +266,12 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.2,
         shadowRadius: 2,
         elevation: 2,
     },
-
-
 
     lineRP: {
         flexDirection: "row",
@@ -196,7 +280,7 @@ const styles = StyleSheet.create({
         marginRight: 15,
         marginTop: 15,
         position: "relative",
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.2,
         shadowRadius: 2,
@@ -207,8 +291,6 @@ const styles = StyleSheet.create({
         width: 110,
         height: 110,
         borderRadius: 15,
-        opacity: 0.8
-    }
-
-
-})
+        opacity: 0.8,
+    },
+});
