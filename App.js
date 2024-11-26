@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Player from "./components/Player";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Upload from "./components/Upload";
 
 const Stack = createStackNavigator();
 
@@ -25,6 +26,7 @@ export default function App() {
                             headerShown: false,
                         }}
                     />
+                    <Stack.Screen name="Upload" component={Upload} />
                     <Stack.Screen
                         name="Player"
                         component={Player}
