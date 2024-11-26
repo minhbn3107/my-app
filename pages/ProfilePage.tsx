@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import React, { useState } from "react";
+import {
+    View,
+    Text,
+    Image,
+    StyleSheet,
+    TouchableOpacity,
+    Switch,
+    ScrollView,
+} from "react-native";
 
-const ProfilePage = () => {
+const ProfilePage = ({ navigation }) => {
     const [pushNotifications, setPushNotifications] = useState(false);
     const [play, setPlay] = useState(true);
 
@@ -10,7 +18,7 @@ const ProfilePage = () => {
             <View style={{ paddingBottom: 110 }}>
                 <View style={styles.profileSection}>
                     <Image
-                        source={{ uri: 'https://i.ibb.co/sVqS2Sd/4.jpg' }}
+                        source={{ uri: "https://i.ibb.co/sVqS2Sd/4.jpg" }}
                         style={styles.avatar}
                     />
                     <Text style={styles.name}>NGUYEN VAN PHONG</Text>
@@ -41,10 +49,13 @@ const ProfilePage = () => {
                         <Text style={styles.itemText}>Thông báo đẩy</Text>
                         <Switch
                             value={pushNotifications}
-                            onValueChange={(value) => setPushNotifications(value)}
-                            trackColor={{ false: "#767577", true: "#6B39F4" }} 
-                            thumbColor={pushNotifications ? "#6B39F4" : "#f4f3f4"} 
-
+                            onValueChange={(value) =>
+                                setPushNotifications(value)
+                            }
+                            trackColor={{ false: "#767577", true: "#6B39F4" }}
+                            thumbColor={
+                                pushNotifications ? "#6B39F4" : "#f4f3f4"
+                            }
                         />
                     </View>
                     <View style={styles.item}>
@@ -52,18 +63,21 @@ const ProfilePage = () => {
                         <Switch
                             value={play}
                             onValueChange={(value) => setPlay(value)}
-                            trackColor={{ false: "#767577", true: "#6B39F4" }} 
-                            thumbColor={pushNotifications ? "#6B39F4" : "#f4f3f4"} 
+                            trackColor={{ false: "#767577", true: "#6B39F4" }}
+                            thumbColor={
+                                pushNotifications ? "#6B39F4" : "#f4f3f4"
+                            }
                         />
                     </View>
                     <View style={styles.item}>
-                        <TouchableOpacity style={styles.logoutButton}>
+                        <TouchableOpacity
+                            style={styles.logoutButton}
+                            onPress={() => navigation.navigate("Login")}
+                        >
                             <Text style={styles.logoutText}>LOGOUT</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-
-
             </View>
         </ScrollView>
     );
@@ -73,10 +87,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     profileSection: {
-        alignItems: 'center',
+        alignItems: "center",
         marginBottom: 20,
     },
     avatar: {
@@ -87,65 +101,65 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
     email: {
-        color: '#888',
+        color: "#888",
         marginBottom: 10,
     },
     editProfileButton: {
-        backgroundColor: '#000',
+        backgroundColor: "#000",
         paddingVertical: 8,
         paddingHorizontal: 20,
         borderRadius: 20,
     },
     editProfileText: {
-        color: '#fff',
-        fontWeight: 'bold',
+        color: "#fff",
+        fontWeight: "bold",
     },
     section: {
         marginVertical: 10,
         padding: 10,
         borderRadius: 10,
-        backgroundColor: '#f4f4f4',
+        backgroundColor: "#f4f4f4",
     },
     sectionTitle: {
         fontSize: 16,
-        color: '#888',
+        color: "#888",
         marginBottom: 10,
     },
     item: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
+        borderBottomColor: "#e0e0e0",
     },
     itemText: {
         fontSize: 16,
-        fontWeight: "500"
+        fontWeight: "500",
     },
     notificationBadge: {
-        backgroundColor: '#0088ff',
+        backgroundColor: "#0088ff",
         borderRadius: 10,
         paddingHorizontal: 8,
         paddingVertical: 2,
     },
     badgeText: {
-        color: '#fff',
-        fontWeight: 'bold',
+        color: "#fff",
+        fontWeight: "bold",
     },
     logoutButton: {
-        alignItems: 'center',
+        alignItems: "center",
         marginTop: 20,
-        width:"100%",
-        textAlign:"center"
+        width: "100%",
+        textAlign: "center",
     },
     logoutText: {
-        color: '#ff3b30',
+        color: "#ff3b30",
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
 });
 

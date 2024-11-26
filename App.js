@@ -5,6 +5,10 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Player from "./components/Player";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Upload from "./components/Upload";
+import Login from "./components/Login";
+import ArtistDetail from "./pages/ArtistDetail";
+import MyPlayList from "./pages/MyPlayList";
+import PlayListDetail from "./pages/PlayListDetail";
 
 const Stack = createStackNavigator();
 
@@ -13,12 +17,17 @@ export default function App() {
         <NavigationContainer>
             <GestureHandlerRootView style={styles.container}>
                 <Stack.Navigator
-                    initialRouteName="Home"
+                    initialRouteName="Login"
                     screenOptions={{
                         cardStyle: { backgroundColor: "transparent" },
                         cardOverlayEnabled: true,
                     }}
                 >
+                    <Stack.Screen
+                        name="Login"
+                        component={Login}
+                        options={{ headerShown: false }}
+                    />
                     <Stack.Screen
                         name="Home"
                         component={Main}
@@ -27,6 +36,27 @@ export default function App() {
                         }}
                     />
                     <Stack.Screen name="Upload" component={Upload} />
+                    <Stack.Screen
+                        name="ArtistDetail"
+                        component={ArtistDetail}
+                        options={{
+                            headerShown: true,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="MyplayList"
+                        component={MyPlayList}
+                        options={{
+                            headerShown: true,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="PlayListDetail"
+                        component={PlayListDetail}
+                        options={{
+                            headerShown: true,
+                        }}
+                    />
                     <Stack.Screen
                         name="Player"
                         component={Player}
