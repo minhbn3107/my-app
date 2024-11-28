@@ -12,7 +12,7 @@ import {
     UIManager,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
+import { expressInstance } from "../helpers/axios";
 
 // Enable LayoutAnimation on Android
 if (
@@ -31,10 +31,8 @@ const Login = () => {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post(
-                isRegister
-                    ? "http://192.168.1.3:3500/register"
-                    : "http://192.168.1.3:3500/login",
+            const response = await expressInstance.post(
+                isRegister ? "/register" : "/login",
                 isRegister
                     ? { user: username, pwd: password, displayName }
                     : { user: username, pwd: password }

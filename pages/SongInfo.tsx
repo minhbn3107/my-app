@@ -7,8 +7,13 @@ import {
     Modal,
     KeyboardAvoidingView,
     Platform,
+    ActivityIndicator,
+    Alert,
+    Switch,
 } from "react-native";
 import { View, Text } from "react-native";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { flaskInstance } from "../helpers/axios";
 
 interface SelectedFile {
     name: string;
@@ -18,6 +23,7 @@ interface SelectedFile {
 }
 
 interface SongInfoProps {
+    selectedFileUrl: string;
     songTitle: string;
     setSongTitle: (title: string) => void;
     mainVoiceGender: string;
@@ -29,6 +35,8 @@ interface SongInfoProps {
     isCreatingNewPlaylist: boolean;
     setIsCreatingNewPlaylist: (isCreating: boolean) => void;
     playlistName: string;
+    isPublic: boolean;
+    setIsPublic: (isPublic: boolean) => void;
     setPlaylistName: (name: string) => void;
     pickPlaylistArtwork: () => void;
     playlistArtwork: SelectedFile | null;
@@ -50,6 +58,7 @@ const DEFAULT_LANGUAGES = [
 const DEFAULT_GENRES = ["Pop", "Rock", "Hip-Hop", "Jazz", "Classical"];
 
 const SongInfo: React.FC<SongInfoProps> = ({
+    selectedFileUrl,
     songTitle,
     setSongTitle,
     mainVoiceGender,
@@ -61,6 +70,8 @@ const SongInfo: React.FC<SongInfoProps> = ({
     isCreatingNewPlaylist,
     setIsCreatingNewPlaylist,
     playlistName,
+    isPublic,
+    setIsPublic,
     setPlaylistName,
     pickPlaylistArtwork,
     playlistArtwork,
@@ -75,6 +86,7 @@ const SongInfo: React.FC<SongInfoProps> = ({
     const [isGenreModalVisible, setGenreModalVisible] = useState(false);
     const [newLanguage, setNewLanguage] = useState("");
     const [newGenre, setNewGenre] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const toggleOption = (
         option: string,
@@ -152,6 +164,77 @@ const SongInfo: React.FC<SongInfoProps> = ({
         </Modal>
     );
 
+    const recognizeGender = async () => {
+        if (!selectedFileUrl) {
+            Alert.alert("Error", "Please select a file first!");
+            return;
+        }
+        setIsLoading(true);
+        const response = await flaskInstance.post("/api/gender-recognition", {
+            url: selectedFileUrl,
+        });
+
+        setIsLoading(false);
+        if (response.status === 200) {
+            const validGenders = response.data.filter(
+                (item: any) => item.label !== "child"
+            );
+
+            const topGender = validGenders.reduce((prev: any, current: any) =>
+                prev.score > current.score ? prev : current
+            );
+
+            setMainVoiceGender(topGender.label);
+        } else {
+            Alert.alert("Error", "Please try again!");
+        }
+    };
+
+    const suggestLanguages = async () => {
+        if (!selectedFileUrl) {
+            Alert.alert("Error", "Please select a song to use this feature!");
+            return;
+        }
+        setIsLoading(true);
+        const response = await flaskInstance.post(
+            "/api/language-identification",
+            {
+                url: selectedFileUrl,
+            }
+        );
+
+        setIsLoading(false);
+        if (!response.data.error) {
+            const languagesArray: string[] = response.data.map(
+                (item: any) => item.label.split(": ")[1]
+            );
+            setLanguages([...languages, ...languagesArray]);
+        } else {
+            Alert.alert("Error", "Please try again!");
+        }
+    };
+
+    const suggestGenres = async () => {
+        if (!selectedFileUrl) {
+            Alert.alert("Error", "Please select a file first!");
+            return;
+        }
+        setIsLoading(true);
+        const response = await flaskInstance.post("/api/audio-classification", {
+            url: selectedFileUrl,
+        });
+
+        setIsLoading(false);
+        if (!response.data.error) {
+            const genresArray: string[] = response.data.map(
+                (item: any) => item.label
+            );
+            setGenres([...genres, ...genresArray.slice(1)]);
+        } else {
+            Alert.alert("Error", "Please try again!");
+        }
+    };
+
     return (
         <View style={styles.songInfoSection}>
             <View style={styles.songInfoHeader}>
@@ -174,7 +257,20 @@ const SongInfo: React.FC<SongInfoProps> = ({
                     {songArtwork ? songArtwork.name : "Upload Song Artwork"}
                 </Text>
             </TouchableOpacity>
-            <Text style={styles.label}>Main Voice Gender</Text>
+            <View style={styles.aiContainer}>
+                <Text style={styles.label}>Main Voice Gender</Text>
+                <TouchableOpacity
+                    style={styles.aiButton}
+                    onPress={recognizeGender}
+                >
+                    <MaterialCommunityIcons
+                        name="account-tie-voice"
+                        size={24}
+                        color="#6B39F4"
+                    />
+                    <Text style={styles.aiColor}>Gender Recognition</Text>
+                </TouchableOpacity>
+            </View>
             <View style={styles.radioGroup}>
                 {["male", "female"].map((gender) => (
                     <TouchableOpacity
@@ -190,7 +286,16 @@ const SongInfo: React.FC<SongInfoProps> = ({
                 ))}
             </View>
 
-            <Text style={styles.label}>Languages</Text>
+            <View style={styles.aiContainer}>
+                <Text style={styles.label}>Languages</Text>
+                <TouchableOpacity
+                    style={styles.aiButton}
+                    onPress={suggestLanguages}
+                >
+                    <MaterialIcons name="language" size={24} color="#6B39F4" />
+                    <Text style={styles.aiColor}>Languages Suggestion</Text>
+                </TouchableOpacity>
+            </View>
             <View style={styles.checkboxGroup}>
                 {DEFAULT_LANGUAGES.map((language) => (
                     <TouchableOpacity
@@ -232,7 +337,20 @@ const SongInfo: React.FC<SongInfoProps> = ({
                 </TouchableOpacity>
             </View>
 
-            <Text style={styles.label}>Genres</Text>
+            <View style={styles.aiContainer}>
+                <Text style={styles.label}>Genres</Text>
+                <TouchableOpacity
+                    style={styles.aiButton}
+                    onPress={suggestGenres}
+                >
+                    <MaterialCommunityIcons
+                        name="music-note-eighth"
+                        size={24}
+                        color="#6B39F4"
+                    />
+                    <Text style={styles.aiColor}>Genres Suggestion</Text>
+                </TouchableOpacity>
+            </View>
             <View style={styles.checkboxGroup}>
                 {DEFAULT_GENRES.map((genre) => (
                     <TouchableOpacity
@@ -266,7 +384,18 @@ const SongInfo: React.FC<SongInfoProps> = ({
                     <Text style={styles.addButtonText}>+</Text>
                 </TouchableOpacity>
             </View>
-            <Text style={styles.label}>Playlist</Text>
+            <View style={styles.publicContainer}>
+                <Text style={styles.label}>Playlist</Text>
+                {isCreatingNewPlaylist && (
+                    <View style={styles.aiButton}>
+                        <Switch
+                            value={isPublic}
+                            onValueChange={() => setIsPublic(!isPublic)}
+                        />
+                        <Text style={styles.aiColor}>Make Public</Text>
+                    </View>
+                )}
+            </View>
             <View style={styles.radioGroup}>
                 <TouchableOpacity
                     style={[
@@ -282,7 +411,10 @@ const SongInfo: React.FC<SongInfoProps> = ({
                         styles.radioOption,
                         isCreatingNewPlaylist && styles.radioSelected,
                     ]}
-                    onPress={() => setIsCreatingNewPlaylist(true)}
+                    onPress={() => {
+                        setIsCreatingNewPlaylist(true);
+                        setPlaylistName("");
+                    }}
                 >
                     <Text>Create New Playlist</Text>
                 </TouchableOpacity>
@@ -386,6 +518,19 @@ const SongInfo: React.FC<SongInfoProps> = ({
                     ),
                 "Add New Genre",
                 "Enter genre name"
+            )}
+
+            {isLoading && (
+                <Modal
+                    transparent={true}
+                    animationType="fade"
+                    visible={isLoading}
+                >
+                    <View style={styles.overlay}>
+                        <ActivityIndicator size="large" color="#ffffff" />
+                        <Text style={styles.loadingText}>AI is working...</Text>
+                    </View>
+                </Modal>
             )}
         </View>
     );
@@ -562,6 +707,36 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: "#fff",
         marginBottom: 15,
+    },
+    aiContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 10,
+    },
+    publicContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
+    aiButton: {
+        flexDirection: "row",
+        gap: 5,
+        alignItems: "center",
+    },
+    aiColor: {
+        color: "#6B39F4",
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+    },
+    loadingText: {
+        marginTop: 20,
+        fontSize: 18,
+        color: "#ffffff",
     },
 });
 

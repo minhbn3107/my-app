@@ -13,8 +13,8 @@ import { useEffect, useState } from "react";
 import UploadHeader from "../pages/UploadHeader";
 import SongInfo from "../pages/SongInfo";
 import handleUpdata from "../helpers/upload";
-import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import { expressInstance } from "../helpers/axios";
 
 export interface SelectedFile {
     name: string;
@@ -26,6 +26,7 @@ export interface SelectedFile {
 const Upload = () => {
     const router = useNavigation();
     const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
+    const [selectedFileUrl, setSelectedFileUrl] = useState<string>("");
     const [uploadProgress, setUploadProgress] = useState<number>(0);
     const [songTitle, setSongTitle] = useState("");
     const [songArtwork, setSongArtwork] = useState<SelectedFile | null>(null);
@@ -35,6 +36,7 @@ const Upload = () => {
     const [isCreatingNewPlaylist, setIsCreatingNewPlaylist] = useState(false);
     const [playlistName, setPlaylistName] = useState<string>("");
     const [existingPlaylists, setExistingPlaylists] = useState<string[]>([]);
+    const [isPublic, setIsPublic] = useState<boolean>(false);
     const [playlistArtwork, setPlaylistArtwork] = useState<SelectedFile | null>(
         null
     );
@@ -43,14 +45,11 @@ const Upload = () => {
 
     const getAllPlaylistNames = async () => {
         try {
-            const response = await axios.get(
-                "http://192.168.101.20:3500/api/playlists/names",
-                {
-                    params: {
-                        userId: "673b4f9b9fa09b0efbfb1a65",
-                    },
-                }
-            );
+            const response = await expressInstance.get("/api/playlists/names", {
+                params: {
+                    userId: "673b4f9b9fa09b0efbfb1a65",
+                },
+            });
 
             if (response.data && response.data.playlists) {
                 setExistingPlaylists(response.data.playlists);
@@ -161,8 +160,6 @@ const Upload = () => {
                     uri: file.uri,
                     mimeType: file.mimeType ?? "audio/unknown",
                 });
-
-                simulateUpload();
             }
         } catch (error) {
             Alert.alert(
@@ -208,6 +205,21 @@ const Upload = () => {
         }, 500);
     };
 
+    const uploadSong = async () => {
+        if (!selectedFile) {
+            console.error("No file selected");
+            return;
+        }
+
+        try {
+            const pickedFileUrl = await handleUpdata(selectedFile);
+            setSelectedFileUrl(pickedFileUrl);
+        } catch (error) {
+            console.error("Error uploading song:", error);
+            Alert.alert("Upload Error", "Failed to upload the song");
+        }
+    };
+
     const getFileDetails = () => {
         if (!selectedFile) return null;
 
@@ -223,6 +235,13 @@ const Upload = () => {
     useEffect(() => {
         getAllPlaylistNames();
     }, []);
+
+    useEffect(() => {
+        if (selectedFile) {
+            uploadSong();
+            simulateUpload();
+        }
+    }, [selectedFile]);
 
     const handleUpload = async () => {
         if (
@@ -242,7 +261,6 @@ const Upload = () => {
         }
 
         setIsLoading(true);
-        const selectedFileUrl = await handleUpdata(selectedFile);
         const songArtworkUrl = await handleUpdata(songArtwork);
         let playlistArtworkUrl = "";
         if (isCreatingNewPlaylist)
@@ -255,6 +273,7 @@ const Upload = () => {
             language: languages,
             genre: genres,
             artistId: "673b4f9b9fa09b0efbfb1a65",
+            isPublic,
             artistName: "Peter Parker",
             artwork: songArtworkUrl,
             playlistName: playlistName,
@@ -265,20 +284,18 @@ const Upload = () => {
         if (!isCreatingNewPlaylist) {
             delete body.playlistArtwork;
             delete body.description;
+            delete body.isPublic;
         }
 
-        const reponse = await axios.post(
-            "http://192.168.101.20:3500/api/songs",
-            body
-        );
-
-        if (reponse.status === 201) {
-            setIsLoading(false);
-            router.navigate("Music" as never);
-        }
+        const response = await expressInstance.post("/api/songs", body);
 
         setIsLoading(false);
-        Alert.alert("Failed", "Song uploaded unsuccessful!");
+        if (response.status === 201) {
+            setIsLoading(false);
+            router.navigate("Home" as never);
+        } else {
+            Alert.alert("Failed", "Song uploaded unsuccessful!");
+        }
     };
 
     return (
@@ -291,6 +308,7 @@ const Upload = () => {
                 getFileDetails={getFileDetails}
             />
             <SongInfo
+                selectedFileUrl={selectedFileUrl}
                 songTitle={songTitle}
                 setSongTitle={setSongTitle}
                 mainVoiceGender={mainVoiceGender}
@@ -302,6 +320,8 @@ const Upload = () => {
                 isCreatingNewPlaylist={isCreatingNewPlaylist}
                 setIsCreatingNewPlaylist={setIsCreatingNewPlaylist}
                 playlistName={playlistName}
+                isPublic={isPublic}
+                setIsPublic={setIsPublic}
                 setPlaylistName={setPlaylistName}
                 pickPlaylistArtwork={pickPlaylistArtwork}
                 playlistArtwork={playlistArtwork}
@@ -320,7 +340,9 @@ const Upload = () => {
                 >
                     <View style={styles.overlay}>
                         <ActivityIndicator size="large" color="#fff" />
-                        <Text style={styles.loadingText}>Uploading...</Text>
+                        <Text style={styles.loadingText}>
+                            Uploading Music...
+                        </Text>
                     </View>
                 </Modal>
             )}
