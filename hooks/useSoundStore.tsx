@@ -2,9 +2,18 @@ export type Track = {
     url: string;
     title: string;
     artist?: string;
+    artistName?: string;
     artwork?: string;
     rating?: number;
-    playlist?: string[];
+    playlists?: {
+        playlistId: string;
+        playlistName: string;
+    }[];
+    mainVoiceGender?: string;
+    language?: string[];
+    genre?: string[];
+    createdAt?: Date;
+    updatedAt?: Date;
 };
 
 export interface PlayerButtonProps {

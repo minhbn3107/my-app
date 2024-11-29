@@ -1,42 +1,74 @@
-import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import React, { useLayoutEffect } from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { FloatingPlayer } from "./FloatingPlayer";
 
 const MyPlayList = ({ route, navigation }) => {
-    const { ARRAY_MY_PLAYLIST } = route.params;
+    const { playlists } = route.params;
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: "All playlists",
+        });
+    });
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text_heading}>Your playlists</Text>
             <View style={styles.lineRP}>
-                {ARRAY_MY_PLAYLIST.map((item, index) => (
+                {playlists.map((item, index) => (
                     <TouchableOpacity
                         key={index}
                         style={styles.itemRP}
-                        onPress={() => navigation.navigate('PlayListDetail', { item })}
+                        onPress={() =>
+                            navigation.navigate("PlayListDetail", {
+                                playlist: item,
+                            })
+                        }
                     >
                         <View>
-                            <Image source={{ uri: item.artwork }} style={styles.imageRP} />
+                            <Image
+                                source={{ uri: item.artwork }}
+                                style={styles.imageRP}
+                            />
                         </View>
-                        <View style={{
-                            width: "100%", paddingLeft: 10, paddingRight: 90,
-                            flexDirection: "row", justifyContent: "space-between", alignItems: "center"
-                        }}>
+                        <View
+                            style={{
+                                width: "100%",
+                                paddingLeft: 10,
+                                paddingRight: 90,
+                                flexDirection: "row",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                            }}
+                        >
                             <View>
                                 <Text style={styles.title}>{item.title}</Text>
-                                <Text style={styles.creator}>{item.creatorName}</Text>
-                                <Text style={styles.songCount}>{item.songCount} songs</Text></View>
+                                <Text style={styles.creator}>
+                                    {item.creatorName}
+                                </Text>
+                                <Text style={styles.songCount}>
+                                    {item.songCount} songs
+                                </Text>
+                            </View>
                             <View>
-                                <FontAwesomeIcon icon={faAngleRight} size={20} />
+                                <FontAwesomeIcon
+                                    icon={faAngleRight}
+                                    size={20}
+                                />
                             </View>
                         </View>
                     </TouchableOpacity>
                 ))}
             </View>
-            <TouchableOpacity style={styles.addButton}>
-                <Text style={styles.addButtonText}>+</Text>
-            </TouchableOpacity>
+            <FloatingPlayer
+                style={{
+                    position: "absolute",
+                    left: 8,
+                    right: 8,
+                    bottom: 5,
+                }}
+            />
         </View>
     );
 };
@@ -45,20 +77,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#fff',
-    },
-    text_heading: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 16,
+        backgroundColor: "#fff",
     },
     itemRP: {
         flexDirection: "row",
         marginTop: 15,
         position: "relative",
-        borderBottomColor:"#eaeaea",
-        borderBottomWidth:1,
-        paddingBottom:15
+        borderBottomColor: "#eaeaea",
+        borderBottomWidth: 1,
+        paddingBottom: 15,
     },
 
     imageRP: {
@@ -68,33 +95,33 @@ const styles = StyleSheet.create({
         opacity: 0.8,
     },
     title: {
-        textAlign: 'left',
-        fontWeight: '600',
+        textAlign: "left",
+        fontWeight: "600",
         fontSize: 18,
     },
     creator: {
         fontSize: 14,
-        color: '#666',
+        color: "#666",
     },
     songCount: {
         fontSize: 12,
-        color: '#999',
+        color: "#999",
     },
     addButton: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 30,
         right: 30,
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#6B39F4',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "#6B39F4",
+        justifyContent: "center",
+        alignItems: "center",
     },
     addButtonText: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 30,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
 });
 

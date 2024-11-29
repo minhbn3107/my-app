@@ -132,18 +132,18 @@ const Player = () => {
                                             </View>
                                         </View>
                                     </View>
-                                    {activeTrack.artist?.length &&
-                                    activeTrack.artist?.length > 30 ? (
+                                    {activeTrack.artistName?.length &&
+                                    activeTrack.artistName?.length > 30 ? (
                                         <Marquee spacing={150} speed={1}>
                                             <Text
                                                 style={styles.trackArtistText}
                                             >
-                                                {activeTrack.artist}
+                                                {activeTrack.artistName}
                                             </Text>
                                         </Marquee>
                                     ) : (
                                         <Text style={styles.trackArtistText}>
-                                            {activeTrack.artist ||
+                                            {activeTrack.artistName ||
                                                 "Unknown Artist"}
                                         </Text>
                                     )}

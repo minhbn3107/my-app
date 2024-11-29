@@ -12,6 +12,7 @@ type PlayerControlsProps = {
 type PlayerButtonProps = {
     style?: ViewStyle;
     iconSize?: number;
+    color?: string;
 };
 export const PlayerControls = ({ style }: PlayerControlsProps) => {
     return (
@@ -98,13 +99,20 @@ export const SkipToPreviousButton = ({ iconSize = 30 }: PlayerButtonProps) => {
         </TouchableOpacity>
     );
 };
-export const ThreeDotsButton = ({ iconSize = 30 }: PlayerButtonProps) => {
+export const ThreeDotsButton = ({
+    iconSize = 30,
+    color = "#fff",
+}: PlayerButtonProps) => {
     return (
         <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => console.log("three")}
         >
-            <Entypo name="dots-three-horizontal" size={iconSize} color="#fff" />
+            <Entypo
+                name="dots-three-horizontal"
+                size={iconSize}
+                color={color}
+            />
         </TouchableOpacity>
     );
 };

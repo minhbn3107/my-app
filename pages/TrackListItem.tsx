@@ -15,6 +15,7 @@ import Animated, {
     withSpring,
     withTiming,
 } from "react-native-reanimated";
+import { ThreeDotsButton } from "./PlayerControls";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -27,7 +28,7 @@ export const TrackListItem = ({
     track,
     onTrackSelect: handleTrackSelect,
 }: TrackListItemProps) => {
-    const { isPlaying, activeTrack } = useSoundStore();
+    const { activeTrack } = useSoundStore();
     const isActiveTrack = activeTrack?.url === track.url;
     const scale = useSharedValue(1);
     const opacity = useSharedValue(1);
@@ -73,20 +74,6 @@ export const TrackListItem = ({
                     }}
                 />
                 {isActiveTrack && (
-                    // (isPlaying ? (
-                    //     <LoaderKit
-                    //         style={styles.trackPlayingIconIndicator}
-                    //         name="LineScaleParty"
-                    //         color="#1ce5ff"
-                    //     />
-                    // ) : (
-                    //     <Ionicons
-                    //         style={styles.trackPausedIndicator}
-                    //         name="play"
-                    //         size={24}
-                    //         color="#1ce5ff"
-                    //     />
-                    // ))
                     <Ionicons
                         style={styles.trackPausedIndicator}
                         name="play"
@@ -114,11 +101,11 @@ export const TrackListItem = ({
                                 color: isActiveTrack ? "#1ce5ff" : "#000",
                             }}
                         >
-                            {track.artist}
+                            {track.artistName}
                         </Text>
                     )}
                 </View>
-                <Entypo name="dots-three-horizontal" size={18} color={"#000"} />
+                <ThreeDotsButton color="#000" />
             </View>
         </AnimatedPressable>
     );
@@ -168,5 +155,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        paddingRight: 10,
     },
 });

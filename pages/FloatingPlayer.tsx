@@ -61,7 +61,7 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
                         </Marquee>
                     ) : (
                         <Text style={styles.trackArtist}>
-                            {activeTrack.artist || "Unknown Artist"}
+                            {activeTrack.artistName || "Unknown Artist"}
                         </Text>
                     )}
                 </View>

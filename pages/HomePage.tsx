@@ -9,196 +9,28 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCirclePlay } from "@fortawesome/free-solid-svg-icons/faCirclePlay";
 import { faAngleRight } from "@fortawesome/free-solid-svg-icons/faAngleRight";
-
-const ARRAY_LIST_TOP_ARTIST = [
-    {
-        id: 1,
-        image: "https://i.ibb.co/4MHWXDR/1.jpg",
-        displayName: "Khalid",
-        followers: "2.3M Followers",
-        myPlaylists: [
-            {
-                url: "https://audio.jukehost.co.uk/vTRYaTEbpaYRCxiWGgL2S91mnOuMKfLw",
-                title: "Guess I'll Never Know",
-                artist: "TrackTribe",
-                artwork: "https://f4.bcbits.com/img/a3736661212_65",
-                rating: 1,
-                playlist: ["Chill 🌱"],
-            },
-            {
-                url: "https://audio.jukehost.co.uk/rSmGXxf0OJLipPwFRyvoFKodDOj5VuWf",
-                title: "Anxiety",
-                artist: "NEFFEX",
-                artwork:
-                    "https://i1.sndcdn.com/artworks-iCqupgQNLXSjKspS-0CGreg-t500x500.jpg",
-                playlist: ["Chill 🌱", "Instrumental 🎵", "Rap 🎤"],
-            },
-        ],
-    },
-    {
-        id: 2,
-        image: "https://i.ibb.co/sVqS2Sd/4.jpg",
-        displayName: "Jun Belend",
-        followers: "1.1M Followers",
-        myPlaylists: [
-            {
-                url: "https://audio.jukehost.co.uk/vTRYaTEbpaYRCxiWGgL2S91mnOuMKfLw",
-                title: "Guess I'll Never Know",
-                artist: "TrackTribe",
-                artwork: "https://f4.bcbits.com/img/a3736661212_65",
-                rating: 1,
-                playlist: ["Chill 🌱"],
-            },
-            {
-                url: "https://audio.jukehost.co.uk/rSmGXxf0OJLipPwFRyvoFKodDOj5VuWf",
-                title: "Anxiety",
-                artist: "NEFFEX",
-                artwork:
-                    "https://i1.sndcdn.com/artworks-iCqupgQNLXSjKspS-0CGreg-t500x500.jpg",
-                playlist: ["Chill 🌱", "Instrumental 🎵", "Rap 🎤"],
-            },
-        ],
-    },
-];
-
-const ARRAY_MY_PLAYLIST = [
-    {
-        title: "Chill Vibes",
-        isPublic: true,
-        artwork: "https://i.ibb.co/f15bK7w/saostar-8svn795m1eeyow83.jpg",
-        creator: "602d2149e7732f4b24f29e7e",
-        creatorName: "John Doe",
-        songs: [
-            {
-                songId: "603d2149e7732f4b24f29e7f",
-                title: "Relaxing Beats",
-                artistName: "Artist One",
-                duration: 180,
-                artwork: "https://i.ibb.co/xyz123/relaxing-beats.jpg",
-            },
-            {
-                songId: "603d2149e7732f4b24f29e80",
-                title: "Evening Chill",
-                artistName: "Artist Two",
-                duration: 210,
-                artwork: "https://i.ibb.co/xyz456/evening-chill.jpg",
-            },
-        ],
-        description: "A collection of chill songs to relax and unwind.",
-        followers: [
-            {
-                userId: "602d2149e7732f4b24f29e81",
-                username: "Alice",
-            },
-        ],
-        songCount: 2,
-        createdAt: "2024-11-20T12:34:56Z",
-        updatedAt: "2024-11-20T12:34:56Z",
-    },
-    {
-        title: "Workout Playlist",
-        isPublic: false,
-        artwork: "https://i.ibb.co/SvWZxXC/31stillprocessing-superjumbo.jpg",
-        creator: "602d2149e7732f4b24f29e82",
-        creatorName: "Jane Smith",
-        songs: [
-            {
-                songId: "603d2149e7732f4b24f29e83",
-                title: "Power Up",
-                artistName: "Artist Three",
-                duration: 250,
-                artwork: "https://i.ibb.co/xyz789/power-up.jpg",
-            },
-            {
-                songId: "603d2149e7732f4b24f29e84",
-                title: "Endorphin Rush",
-                artistName: "Artist Four",
-                duration: 200,
-                artwork: "https://i.ibb.co/xyz012/endorphin-rush.jpg",
-            },
-        ],
-        description: "Songs to pump you up during your workout.",
-        followers: [
-            {
-                userId: "602d2149e7732f4b24f29e85",
-                username: "Bob",
-            },
-        ],
-        songCount: 2,
-        createdAt: "2024-11-21T10:20:30Z",
-        updatedAt: "2024-11-21T10:20:30Z",
-    },
-    {
-        title: "PHONG",
-        isPublic: false,
-        artwork: "https://i.ibb.co/SvWZxXC/31stillprocessing-superjumbo.jpg",
-        creator: "602d2149e7732f4b24f29e82",
-        creatorName: "Jane Smith",
-        songs: [
-            {
-                songId: "603d2149e7732f4b24f29e83",
-                title: "Power Up",
-                artistName: "Artist Three",
-                duration: 250,
-                artwork: "https://i.ibb.co/xyz789/power-up.jpg",
-            },
-            {
-                songId: "603d2149e7732f4b24f29e84",
-                title: "Endorphin Rush",
-                artistName: "Artist Four",
-                duration: 200,
-                artwork: "https://i.ibb.co/xyz012/endorphin-rush.jpg",
-            },
-        ],
-        description: "Songs to pump you up during your workout.",
-        followers: [
-            {
-                userId: "602d2149e7732f4b24f29e85",
-                username: "Bob",
-            },
-        ],
-        songCount: 2,
-        createdAt: "2024-11-21T10:20:30Z",
-        updatedAt: "2024-11-21T10:20:30Z",
-    },
-    {
-        title: "BTS Playlist",
-        isPublic: false,
-        artwork: "https://i.ibb.co/f15bK7w/saostar-8svn795m1eeyow83.jpg",
-        creator: "602d2149e7732f4b24f29e82",
-        creatorName: "Jane Smith",
-        songs: [
-            {
-                songId: "603d2149e7732f4b24f29e83",
-                title: "Power Up",
-                artistName: "Artist Three",
-                duration: 250,
-                artwork: "https://i.ibb.co/xyz789/power-up.jpg",
-            },
-            {
-                songId: "603d2149e7732f4b24f29e84",
-                title: "Endorphin Rush",
-                artistName: "Artist Four",
-                duration: 200,
-                artwork: "https://i.ibb.co/xyz012/endorphin-rush.jpg",
-            },
-        ],
-        description: "Songs to pump you up during your workout.",
-        followers: [
-            {
-                userId: "602d2149e7732f4b24f29e85",
-                username: "Bob",
-            },
-        ],
-        songCount: 2,
-        createdAt: "2024-11-21T10:20:30Z",
-        updatedAt: "2024-11-21T10:20:30Z",
-    },
-];
-
-const item = ARRAY_MY_PLAYLIST[0];
+import { useEffect, useState } from "react";
+import { expressInstance } from "../helpers/axios";
 
 const HomePage = ({ navigation }) => {
+    const [artistList, setArtistList] = useState([]);
+    const [playlists, setPlaylists] = useState([]);
+
+    const getAllArtists = async () => {
+        const artistResponse = await expressInstance.get("/api/artists");
+        setArtistList(artistResponse.data.artists);
+    };
+
+    const getAllPlaylists = async () => {
+        const playlistResponse = await expressInstance.get("/api/playlists");
+        setPlaylists(playlistResponse.data.playlists);
+    };
+
+    useEffect(() => {
+        getAllArtists();
+        getAllPlaylists();
+    }, []);
+
     return (
         <View style={styles.container}>
             <ScrollView style={{ padding: 10 }}>
@@ -209,10 +41,10 @@ const HomePage = ({ navigation }) => {
                         showsHorizontalScrollIndicator={false}
                         style={styles.lineTopAr}
                     >
-                        {ARRAY_LIST_TOP_ARTIST.map((item) => {
+                        {artistList.map((item) => {
                             return (
                                 <TouchableOpacity
-                                    key={item.id}
+                                    key={item._id}
                                     style={styles.itemtopAr}
                                     onPress={() =>
                                         navigation.navigate("ArtistDetail", {
@@ -221,7 +53,7 @@ const HomePage = ({ navigation }) => {
                                     }
                                 >
                                     <Image
-                                        source={{ uri: item.image }}
+                                        source={{ uri: item.imageURL }}
                                         style={styles.imageTop}
                                     />
                                     <Text
@@ -305,58 +137,62 @@ const HomePage = ({ navigation }) => {
                         <TouchableOpacity
                             onPress={() =>
                                 navigation.navigate("MyplayList", {
-                                    ARRAY_MY_PLAYLIST,
+                                    playlists,
                                 })
                             }
                         >
-                            <Text style={{ color: "blue", fontWeight: "500" }}>
+                            <Text style={styles.playlist_heading}>
                                 Show all
                             </Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.lineRP}>
-                        <TouchableOpacity
-                            style={styles.itemRP}
-                            onPress={() =>
-                                navigation.navigate("PlayListDetail", { item })
-                            }
-                        >
-                            <View>
-                                <Image
-                                    source={{ uri: item.artwork }}
-                                    style={styles.imageRP}
-                                />
-                            </View>
-                            <View
-                                style={{
-                                    width: "100%",
-                                    paddingLeft: 10,
-                                    paddingRight: 90,
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
+                    {playlists.slice(0, 3).map((item) => (
+                        <View style={styles.lineRP} key={item._id}>
+                            <TouchableOpacity
+                                style={styles.itemRP}
+                                onPress={() => {
+                                    navigation.navigate("PlayListDetail", {
+                                        playlist: item,
+                                    });
                                 }}
                             >
                                 <View>
-                                    <Text style={styles.title}>
-                                        {item.title}
-                                    </Text>
-                                    <Text style={styles.creator}>
-                                        {item.creatorName}
-                                    </Text>
-                                    <Text style={styles.songCount}>
-                                        {item.songCount} songs
-                                    </Text>
-                                </View>
-                                <View>
-                                    <FontAwesomeIcon
-                                        icon={faAngleRight}
-                                        size={20}
+                                    <Image
+                                        source={{ uri: item.artwork }}
+                                        style={styles.imageRP}
                                     />
                                 </View>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                                <View
+                                    style={{
+                                        width: "100%",
+                                        paddingLeft: 10,
+                                        paddingRight: 90,
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <View>
+                                        <Text style={styles.title}>
+                                            {item.title}
+                                        </Text>
+                                        <Text style={styles.creator}>
+                                            {item.creatorName}
+                                        </Text>
+                                        <Text style={styles.songCount}>
+                                            {item.songCount} songs
+                                        </Text>
+                                    </View>
+                                    <View>
+                                        <FontAwesomeIcon
+                                            icon={faAngleRight}
+                                            size={20}
+                                        />
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
                 </View>
                 <View style={{ paddingTop: 100 }}></View>
             </ScrollView>
@@ -368,7 +204,6 @@ export default HomePage;
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
         backgroundColor: "#fafafa",
     },
     text_heading: {
@@ -377,7 +212,11 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         marginTop: 5,
     },
-
+    playlist_heading: {
+        color: "blue",
+        fontWeight: "500",
+        fontSize: 18,
+    },
     lineTopAr: {
         flexDirection: "row",
     },
@@ -389,7 +228,6 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 100,
     },
-
     imgnewAb: {
         width: "100%",
         height: 160,
@@ -398,7 +236,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         opacity: 0.9,
     },
-
     btnPlay: {
         width: 45,
         height: 45,
@@ -413,19 +250,16 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         elevation: 2,
     },
-
     lineRP: {
         flexDirection: "column",
     },
     itemRP: {
         flexDirection: "row",
         marginTop: 15,
-        position: "relative",
         borderBottomColor: "#eaeaea",
         borderBottomWidth: 1,
         paddingBottom: 15,
     },
-
     imageRP: {
         width: 90,
         height: 90,
