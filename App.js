@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import ArtistDetail from "./pages/ArtistDetail";
 import MyPlayList from "./pages/MyPlayList";
 import PlayListDetail from "./pages/PlayListDetail";
+import SongDetail from "./pages/SongDetail";
 
 const Stack = createStackNavigator();
 
@@ -53,6 +54,13 @@ export default function App() {
                     <Stack.Screen
                         name="PlayListDetail"
                         component={PlayListDetail}
+                        options={{
+                            headerShown: true,
+                        }}
+                    />
+                    <Stack.Screen
+                        name="Song Detail"
+                        component={SongDetail}
                         options={{
                             headerShown: true,
                         }}
