@@ -15,6 +15,7 @@ import SongInfo from "../pages/SongInfo";
 import handleUpdata from "../helpers/upload";
 import { useNavigation } from "@react-navigation/native";
 import { expressInstance } from "../helpers/axios";
+import { getStored_id, getStoredDisplayName } from "../helpers/authStorage";
 
 export interface SelectedFile {
     name: string;
@@ -42,12 +43,36 @@ const Upload = () => {
     );
     const [description, setDescription] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
+    const [_id, set_id] = useState(null);
+    const [displayName, setDisplayName] = useState("");
+
+    useEffect(() => {
+        const fetchUser_id = async () => {
+            try {
+                const stored_id = await getStored_id();
+                set_id(stored_id);
+            } catch (error) {
+                console.error("Failed to fetch username", error);
+            }
+        };
+        const fetchDisplayName = async () => {
+            try {
+                const storedDisplayName = await getStoredDisplayName();
+                setDisplayName(storedDisplayName);
+            } catch (error) {
+                console.error("Failed to fetch username", error);
+            }
+        };
+
+        fetchUser_id();
+        fetchDisplayName();
+    }, []);
 
     const getAllPlaylistNames = async () => {
         try {
             const response = await expressInstance.get("/api/playlists/names", {
                 params: {
-                    userId: "673b4f9b9fa09b0efbfb1a65",
+                    userId: _id,
                 },
             });
 
@@ -272,9 +297,9 @@ const Upload = () => {
             mainVoiceGender: mainVoiceGender,
             language: languages,
             genre: genres,
-            artistId: "673b4f9b9fa09b0efbfb1a65",
+            artistId: _id,
             isPublic,
-            artistName: "Peter Parker",
+            artistName: displayName,
             artwork: songArtworkUrl,
             playlistName: playlistName,
             playlistArtwork: playlistArtworkUrl,

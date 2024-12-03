@@ -4,7 +4,6 @@ import {
     Text,
     Image,
     StyleSheet,
-    ScrollView,
     TouchableOpacity,
     SafeAreaView,
 } from "react-native";
@@ -13,11 +12,15 @@ import { useSoundStore } from "../hooks/useSoundStore";
 import { expressInstance } from "../helpers/axios";
 import { TracksList } from "./TracksList";
 import { FloatingPlayer } from "./FloatingPlayer";
+import { getStored_id, getStoredUsername } from "../helpers/authStorage";
 
 const PlayListDetail = ({ route, navigation }) => {
     const { playlist } = route.params;
     const [tracks, setTracks] = useState([]);
-    const { play, toggleShuffle, setVolume } = useSoundStore();
+    const { play, toggleShuffle } = useSoundStore();
+    const [followers_id, setFollowers_id] = useState([]);
+    const [_id, set_id] = useState(null);
+    const [username, setuserName] = useState(null);
 
     const getSongsOfPlaylists = async () => {
         const response = await expressInstance.get(
@@ -26,20 +29,59 @@ const PlayListDetail = ({ route, navigation }) => {
         setTracks(response.data.songs);
     };
 
+    const fetchUser_id = async () => {
+        try {
+            const stored_id = await getStored_id();
+            set_id(stored_id);
+        } catch (error) {
+            console.error("Failed to fetch user ID", error);
+        }
+    };
+
+    const fetchUsername = async () => {
+        try {
+            const username = await getStoredUsername();
+            setuserName(username);
+        } catch (error) {
+            console.error("Failed to fetch user ID", error);
+        }
+    };
+
+    const handleToggleFollow = async () => {
+        try {
+            await expressInstance.post("/api/playlists/follow", {
+                followID: playlist._id,
+                id: _id,
+                username: username,
+            });
+
+            if (isFollowing) {
+                setFollowers_id(followers_id.filter((id) => id !== _id));
+            } else {
+                setFollowers_id([...followers_id, _id]);
+            }
+        } catch (error) {
+            console.error("Error toggling follow status:", error);
+        }
+    };
+
     const handlePlayFromStart = async () => {
         await play(tracks[0], tracks);
-        setVolume(1);
     };
 
     const handlePlayShuffle = async () => {
         await play(tracks[0], tracks);
         toggleShuffle();
-        setVolume(1);
     };
 
+    const isFollowing = followers_id.includes(_id);
+
     useEffect(() => {
+        fetchUser_id();
+        fetchUsername();
         getSongsOfPlaylists();
-    }, []);
+        setFollowers_id(playlist.followers.map((follower) => follower.userId));
+    }, [playlist, username, _id]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -89,11 +131,23 @@ const PlayListDetail = ({ route, navigation }) => {
                     >
                         <Ionicons name="play-outline" size={24} color="white" />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.followButton}>
-                        <Text style={styles.followButtonText}>
-                            Add to Playlist
-                        </Text>
-                    </TouchableOpacity>
+                    {playlist.creator !== _id && (
+                        <TouchableOpacity
+                            style={[
+                                styles.followButton,
+                                isFollowing
+                                    ? styles.following
+                                    : styles.notFollowing,
+                            ]}
+                            onPress={handleToggleFollow}
+                        >
+                            <Text style={styles.followButtonText}>
+                                {isFollowing
+                                    ? "Added to Playlist"
+                                    : "Add to Playlist"}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={{ paddingHorizontal: 10, marginRight: 10 }}>
                     <TracksList tracks={tracks} />
@@ -176,6 +230,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: "100%",
         marginHorizontal: 10,
+    },
+    following: {
+        backgroundColor: "#E0E0E0",
+    },
+    notFollowing: {
+        backgroundColor: "#E0E0E0",
     },
 });
 

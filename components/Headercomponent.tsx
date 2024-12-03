@@ -1,18 +1,35 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React from "react";
-const logo = require("../assets/logo.jpg");
+import {
+    getStoredDisplayName,
+    getStoredImageUrl,
+} from "../helpers/authStorage";
+import { useEffect, useState } from "react";
 
-const Headercomponent = () => {
+const HeaderComponent = () => {
+    const [displayName, setDisplayName] = useState("");
+    const [imageURL, setImageURL] = useState("");
+
+    useEffect(() => {
+        getStoredDisplayName().then((displayName) => {
+            setDisplayName(displayName);
+        }),
+            getStoredImageUrl().then((imageURL) => {
+                setImageURL(imageURL);
+            });
+    }, []);
     return (
         <View style={styles.containerheader}>
-            <Image source={logo} style={styles.img_logo} />
+            <Image
+                source={require("../assets/logo.jpg")}
+                style={styles.img_logo}
+            />
             <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <View style={styles.borderLine}>
-                    <Text>Ten nguoi dung</Text>
+                    <Text>{displayName}</Text>
                 </View>
                 <View>
                     <Image
-                        source={{ uri: "https://i.ibb.co/sVqS2Sd/4.jpg" }}
+                        source={{ uri: imageURL || "https://ibb.co/7gY27ny" }}
                         style={styles.avatar_img}
                     />
                 </View>
@@ -21,12 +38,11 @@ const Headercomponent = () => {
     );
 };
 
-export default Headercomponent;
+export default HeaderComponent;
 
 const styles = StyleSheet.create({
     containerheader: {
         width: "100%",
-        // backgroundColor: "#f2f2f2",
         backgroundColor: "#fafafa",
         borderBottomColor: "#efeded",
         borderBottomWidth: 1,

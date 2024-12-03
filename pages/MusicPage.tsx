@@ -7,62 +7,48 @@ import {
     TouchableOpacity,
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-
-const trackData = [
-    {
-        id: "1",
-        title: "Hands To Myself",
-        date: "Oct 15, 2021",
-        image: "https://your-image-url-1",
-    },
-    {
-        id: "2",
-        title: "At My Worst (Feat. Kehlani)",
-        date: "Oct 10, 2021",
-        image: "https://your-image-url-2",
-    },
-    {
-        id: "3",
-        title: "At My Worst (Feat. Kehlani)",
-        date: "Oct 10, 2021",
-        image: "https://your-image-url-2",
-    },
-    {
-        id: "4",
-        title: "At My Worst (Feat. Kehlani)",
-        date: "Oct 10, 2021",
-        image: "https://your-image-url-2",
-    },
-    {
-        id: "5",
-        title: "At My Worst (Feat. Kehlani)",
-        date: "Oct 10, 2021",
-        image: "https://your-image-url-2",
-    },
-    {
-        id: "6",
-        title: "At My Worst (Feat. Kehlani)",
-        date: "Oct 10, 2021",
-        image: "https://your-image-url-2",
-    },
-    {
-        id: "7",
-        title: "At My Worst (Feat. Kehlani)",
-        date: "Oct 10, 2021",
-        image: "https://your-image-url-2",
-    },
-];
+import { expressInstance } from "../helpers/axios";
+import { getStored_id } from "../helpers/authStorage";
+import { formatDate } from "../helpers/formatDate";
+import { ThreeDotsButton } from "./PlayerControls";
+import { Track, useSoundStore } from "../hooks/useSoundStore";
 
 const MusicPage = () => {
     const [limit, setLimit] = useState(3);
     const [view, setView] = useState("See All");
+    const [_id, set_id] = useState(null);
+    const [trackData, setTrackData] = useState([]);
+    const { play } = useSoundStore();
     const router = useNavigation();
+
+    const fetchUser_id = async () => {
+        try {
+            const stored_id = await getStored_id();
+            set_id(stored_id);
+        } catch (error) {
+            console.error("Failed to fetch username", error);
+        }
+    };
+
+    const getUploadedSong = async () => {
+        const response = await expressInstance.get(`/api/songs/artist/${_id}`);
+        setTrackData(response.data.songs);
+    };
+
+    useEffect(() => {
+        fetchUser_id();
+        getUploadedSong();
+    }, [_id]);
 
     const toggleView = () => {
         setLimit(limit === 3 ? trackData.length : 3);
         setView(limit === 3 ? "See Less" : "See All");
+    };
+
+    const handlePlay = (track: Track) => {
+        play(track, trackData);
     };
     return (
         <View style={styles.contentContainer}>
@@ -102,9 +88,13 @@ const MusicPage = () => {
                         </TouchableOpacity>
                     </View>
                     {trackData.slice(0, limit).map((item) => (
-                        <View key={item.id} style={styles.trackItem}>
+                        <TouchableOpacity
+                            key={item._id}
+                            style={styles.trackItem}
+                            onPress={() => handlePlay(item)}
+                        >
                             <Image
-                                source={{ uri: item.image }}
+                                source={{ uri: item.artwork }}
                                 style={styles.trackImage}
                             />
                             <View style={styles.trackDetails}>
@@ -112,12 +102,14 @@ const MusicPage = () => {
                                     {item.title}
                                 </Text>
                                 <Text style={styles.trackDate}>
-                                    {item.date}
+                                    {formatDate(item.createdAt)}
                                 </Text>
                             </View>
-                        </View>
+                            <ThreeDotsButton color="#000" />
+                        </TouchableOpacity>
                     ))}
                 </View>
+                <View style={{ height: 150 }}></View>
             </ScrollView>
         </View>
     );

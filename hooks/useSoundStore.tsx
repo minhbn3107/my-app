@@ -1,4 +1,5 @@
 export type Track = {
+    _id: string;
     url: string;
     title: string;
     artist?: string;

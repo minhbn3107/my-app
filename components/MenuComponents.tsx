@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import HomePage from "../pages/HomePage";
-import FeedMain from "../pages/FeedMain";
+import FeedMain from "../pages/Search";
 import MusicPage from "../pages/MusicPage";
 import ProfilePage from "../pages/ProfilePage";
 
@@ -49,7 +49,7 @@ const MenuComponent = ({ navigation }) => {
             case "Home":
                 return <HomePage navigation={navigation} />;
             case "Search":
-                return <FeedMain />;
+                return <FeedMain navigation={navigation} />;
             case "Music":
                 return <MusicPage />;
             case "Profile":
@@ -66,7 +66,6 @@ const MenuComponent = ({ navigation }) => {
     return (
         <>
             <View style={styles.mainView}>{renderScreen()}</View>
-
             <View style={styles.boxMenu}>
                 <View style={styles.bottomTab}>
                     {ARRAY_LIST_MENU.map((tab) => (
@@ -117,7 +116,6 @@ const styles = StyleSheet.create({
     },
     bottomTab: {
         flexDirection: "row",
-        // borderWidth: 1,
         justifyContent: "space-around",
         alignItems: "center",
         backgroundColor: "#FAFAFA",

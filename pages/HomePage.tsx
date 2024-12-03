@@ -7,14 +7,20 @@ import {
     View,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faCirclePlay } from "@fortawesome/free-solid-svg-icons/faCirclePlay";
+import {
+    faCirclePlay,
+    height,
+} from "@fortawesome/free-solid-svg-icons/faCirclePlay";
 import { faAngleRight } from "@fortawesome/free-solid-svg-icons/faAngleRight";
 import { useEffect, useState } from "react";
 import { expressInstance } from "../helpers/axios";
+import { Track, useSoundStore } from "../hooks/useSoundStore";
 
 const HomePage = ({ navigation }) => {
     const [artistList, setArtistList] = useState([]);
     const [playlists, setPlaylists] = useState([]);
+    const [newestSong, setNewestSong] = useState([]);
+    const { play } = useSoundStore();
 
     const getAllArtists = async () => {
         const artistResponse = await expressInstance.get("/api/artists");
@@ -26,14 +32,25 @@ const HomePage = ({ navigation }) => {
         setPlaylists(playlistResponse.data.playlists);
     };
 
+    const getNewestSong = async () => {
+        const songResponse = await expressInstance.get("/api/songs/newest");
+        setNewestSong(songResponse.data.songs);
+    };
+
+    const handlePlay = (track: Track) => {
+        play(track, newestSong);
+    };
+
     useEffect(() => {
         getAllArtists();
         getAllPlaylists();
+        getNewestSong();
     }, []);
 
     return (
         <View style={styles.container}>
             <ScrollView style={{ padding: 10 }}>
+                {/* Top Artists Section */}
                 <View>
                     <Text style={styles.text_heading}>TOP Artist</Text>
                     <ScrollView
@@ -56,12 +73,7 @@ const HomePage = ({ navigation }) => {
                                         source={{ uri: item.imageURL }}
                                         style={styles.imageTop}
                                     />
-                                    <Text
-                                        style={{
-                                            textAlign: "center",
-                                            fontWeight: "500",
-                                        }}
-                                    >
+                                    <Text style={styles.artistName}>
                                         {item.displayName}
                                     </Text>
                                 </TouchableOpacity>
@@ -69,61 +81,45 @@ const HomePage = ({ navigation }) => {
                         })}
                     </ScrollView>
                 </View>
+
+                {/* New Songs Section */}
                 <View style={{ marginTop: 15 }}>
-                    <Text style={styles.text_heading}>New Album</Text>
-                    <View style={{ position: "relative" }}>
-                        <Image
-                            source={{
-                                uri: "https://i.ibb.co/8rn2GGf/new-ab1.webp",
-                            }}
-                            style={styles.imgnewAb}
-                        />
-                        <View
-                            style={{
-                                height: "100%",
-                                position: "absolute",
-                                top: 0,
-                                justifyContent: "flex-end",
-                            }}
+                    <Text style={styles.text_heading}>New Songs</Text>
+                    {newestSong.map((song) => (
+                        <TouchableOpacity
+                            key={song._id}
+                            style={styles.newSongContainer}
                         >
-                            <View
-                                style={{
-                                    width: "100%",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    padding: 15,
-                                }}
-                            >
-                                <View>
-                                    <Text
-                                        style={{
-                                            fontSize: 17,
-                                            fontWeight: "500",
-                                            color: "#fff",
-                                        }}
-                                    >
-                                        Listen to best music today
-                                    </Text>
-                                    <Text
-                                        style={{
-                                            fontSize: 15,
-                                            fontWeight: "500",
-                                            color: "#fff",
-                                        }}
-                                    >
-                                        12.00 - 114.00 MB
-                                    </Text>
-                                </View>
-                                <View>
-                                    <TouchableOpacity style={styles.btnPlay}>
-                                        <FontAwesomeIcon icon={faCirclePlay} />
-                                    </TouchableOpacity>
-                                </View>
+                            <Image
+                                source={{ uri: song.artwork }}
+                                style={styles.newSongArtwork}
+                            />
+                            <View style={styles.newSongDetails}>
+                                <Text style={styles.newSongTitle}>
+                                    {song.title}
+                                </Text>
+                                <Text style={styles.newSongArtist}>
+                                    {song.artistName}
+                                </Text>
+                                <Text style={styles.newSongGenre}>
+                                    {song.genre.join(", ")}
+                                </Text>
                             </View>
-                        </View>
-                    </View>
+                            <TouchableOpacity
+                                style={styles.btnPlay}
+                                onPress={() => handlePlay(song)}
+                            >
+                                <FontAwesomeIcon
+                                    icon={faCirclePlay}
+                                    size={25}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
+                        </TouchableOpacity>
+                    ))}
                 </View>
 
+                {/* My Playlists Section */}
                 <View
                     style={{ marginTop: 15, marginBottom: 50, paddingRight: 5 }}
                 >
@@ -193,8 +189,8 @@ const HomePage = ({ navigation }) => {
                             </TouchableOpacity>
                         </View>
                     ))}
+                    <View style={{ height: 100 }}></View>
                 </View>
-                <View style={{ paddingTop: 100 }}></View>
             </ScrollView>
         </View>
     );
@@ -222,33 +218,59 @@ const styles = StyleSheet.create({
     },
     itemtopAr: {
         margin: 10,
+        alignItems: "center",
+    },
+    artistName: {
+        textAlign: "center",
+        fontWeight: "500",
     },
     imageTop: {
         width: 60,
         height: 60,
         borderRadius: 100,
     },
-    imgnewAb: {
-        width: "100%",
-        height: 160,
-        objectFit: "cover",
-        borderRadius: 15,
-        marginTop: 10,
-        opacity: 0.9,
-    },
-    btnPlay: {
-        width: 45,
-        height: 45,
-        padding: 9,
-        backgroundColor: "#fff",
-        borderRadius: 100,
-        justifyContent: "center",
+    newSongContainer: {
+        flexDirection: "row",
         alignItems: "center",
+        marginBottom: 10,
+        backgroundColor: "#fff",
+        padding: 10,
+        borderRadius: 10,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.2,
         shadowRadius: 2,
         elevation: 2,
+    },
+    newSongArtwork: {
+        width: 70,
+        height: 70,
+        borderRadius: 10,
+    },
+    newSongDetails: {
+        flex: 1,
+        marginLeft: 10,
+    },
+    newSongTitle: {
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    newSongArtist: {
+        fontSize: 14,
+        color: "#555",
+    },
+    newSongGenre: {
+        fontSize: 12,
+        color: "#888",
+    },
+    btnPlay: {
+        width: 40,
+        height: 40,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 100,
+        backgroundColor: "#fff",
+        elevation: 3,
     },
     lineRP: {
         flexDirection: "column",

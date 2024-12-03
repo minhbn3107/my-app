@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     StyleSheet,
     Text,
@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { expressInstance } from "../helpers/axios";
+import { checkLoginStatus, saveLoginInfo } from "../helpers/authStorage";
 
-// Enable LayoutAnimation on Android
 if (
     Platform.OS === "android" &&
     UIManager.setLayoutAnimationEnabledExperimental
@@ -29,16 +29,38 @@ const Login = () => {
     const [isRegister, setIsRegister] = useState(false);
     const navigation = useNavigation();
 
+    useEffect(() => {
+        const verifyLoginStatus = async () => {
+            const isLoggedIn = await checkLoginStatus();
+            if (isLoggedIn) {
+                navigation.navigate("Home" as never);
+            }
+        };
+
+        verifyLoginStatus();
+    }, []);
+
     const handleLogin = async () => {
         try {
             const response = await expressInstance.post(
                 isRegister ? "/register" : "/login",
                 isRegister
-                    ? { user: username, pwd: password, displayName }
+                    ? {
+                          user: username,
+                          pwd: password,
+                          displayName,
+                      }
                     : { user: username, pwd: password }
             );
 
             if (response.data.match) {
+                await saveLoginInfo(
+                    response.data.foundUser._id,
+                    username,
+                    response.data.foundUser.displayName,
+                    response.data.foundUser.imageURL
+                );
+
                 navigation.navigate("Home" as never);
             } else {
                 Alert.alert(

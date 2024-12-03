@@ -15,7 +15,7 @@ const MyPlayList = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.lineRP}>
+            <View>
                 {playlists.map((item, index) => (
                     <TouchableOpacity
                         key={index}

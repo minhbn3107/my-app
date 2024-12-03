@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import Headercomponent from "./Headercomponent";
+import HeaderComponent from "./HeaderComponent";
 import MenuComponent from "./MenuComponents";
 import { FloatingPlayer } from "../pages/FloatingPlayer";
 
 const Main = ({ navigation }) => {
     return (
         <View style={styles.container}>
-            <Headercomponent />
+            <HeaderComponent />
             <StatusBar style="dark" />
             <MenuComponent navigation={navigation} />
             <FloatingPlayer

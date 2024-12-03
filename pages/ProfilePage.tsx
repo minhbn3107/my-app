@@ -8,6 +8,7 @@ import {
     Switch,
     ScrollView,
 } from "react-native";
+import { logout } from "../helpers/authStorage";
 
 const ProfilePage = ({ navigation }) => {
     const [pushNotifications, setPushNotifications] = useState(false);
@@ -72,7 +73,10 @@ const ProfilePage = ({ navigation }) => {
                     <View style={styles.item}>
                         <TouchableOpacity
                             style={styles.logoutButton}
-                            onPress={() => navigation.navigate("Login")}
+                            onPress={async () => {
+                                await logout();
+                                navigation.navigate("Login");
+                            }}
                         >
                             <Text style={styles.logoutText}>LOGOUT</Text>
                         </TouchableOpacity>

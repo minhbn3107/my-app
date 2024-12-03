@@ -23,6 +23,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSoundStore } from "../hooks/useSoundStore";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { getStored_id } from "../helpers/authStorage";
+import { expressInstance } from "../helpers/axios";
+import { set } from "ts-pattern/dist/patterns";
 
 const Player = () => {
     const { activeTrack } = useSoundStore();
@@ -30,8 +34,57 @@ const Player = () => {
     //     activeTrack?.artwork ?? unknownTrackImageUri
     // );
     const { top, bottom } = useSafeAreaInsets();
-    const isFavorite = false;
-    const toggleFavorite = () => {};
+    const [likedSongs, setLikedSongs] = useState([]);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [_id, set_id] = useState(null);
+
+    const fetchUser_id = async () => {
+        try {
+            const stored_id = await getStored_id();
+            set_id(stored_id);
+        } catch (error) {
+            console.error("Failed to fetch user ID", error);
+        }
+    };
+
+    const getLikedSongsOfUser = async () => {
+        try {
+            const response = await expressInstance.get(
+                `/api/users/liked/${_id}`
+            );
+            setLikedSongs(response.data);
+        } catch (error) {
+            console.error("Failed to fetch liked songs", error);
+        }
+    };
+
+    const handleToggleFavorite = async () => {
+        try {
+            await expressInstance.post("/api/songs/like", {
+                userId: _id,
+                songId: activeTrack._id,
+            });
+
+            if (isFavorite) {
+                setLikedSongs(likedSongs.filter((id) => id !== _id));
+                setIsFavorite(false);
+            } else {
+                setLikedSongs([...likedSongs, _id]);
+                setIsFavorite(true);
+            }
+        } catch (error) {
+            console.error("Error toggling like status:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUser_id();
+        if (_id) {
+            getLikedSongsOfUser();
+        }
+        setIsFavorite(likedSongs.includes(activeTrack._id));
+    }, [isFavorite, likedSongs]);
+
     if (!activeTrack) {
         return (
             <View
@@ -128,6 +181,28 @@ const Player = () => {
                                                     alignItems: "center",
                                                 }}
                                             >
+                                                <TouchableOpacity
+                                                    onPress={
+                                                        handleToggleFavorite
+                                                    }
+                                                >
+                                                    <FontAwesome
+                                                        name={
+                                                            isFavorite
+                                                                ? "heart"
+                                                                : "heart-o"
+                                                        }
+                                                        size={25}
+                                                        color={
+                                                            isFavorite
+                                                                ? "#fe2c55"
+                                                                : "#fff"
+                                                        }
+                                                        style={{
+                                                            marginHorizontal: 14,
+                                                        }}
+                                                    />
+                                                </TouchableOpacity>
                                                 <PlayerRepeatToggle size={30} />
                                             </View>
                                         </View>
@@ -154,53 +229,6 @@ const Player = () => {
                             <PlayerVolumeBar
                                 style={{ marginTop: "auto", marginBottom: 80 }}
                             />
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <FontAwesome
-                                        name={isFavorite ? "heart" : "heart-o"}
-                                        size={25}
-                                        color={isFavorite ? "#1ce5ff" : "#fff"}
-                                        style={{ marginHorizontal: 14 }}
-                                        onPress={toggleFavorite}
-                                    />
-                                    <Text
-                                        style={{
-                                            color: "#fff",
-                                            marginRight: 20,
-                                            fontSize: 15,
-                                        }}
-                                    >
-                                        12K
-                                    </Text>
-                                    <MaterialCommunityIcons
-                                        name="comment-text-outline"
-                                        size={25}
-                                        color="#fff"
-                                        style={{ marginHorizontal: 14 }}
-                                    />
-                                    <Text
-                                        style={{
-                                            color: "#fff",
-                                            fontSize: 15,
-                                        }}
-                                    >
-                                        450
-                                    </Text>
-                                </View>
-                                <Feather name="upload" size={30} color="#fff" />
-                            </View>
                         </View>
                     </View>
                 </View>
