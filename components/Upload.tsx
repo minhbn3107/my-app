@@ -258,8 +258,10 @@ const Upload = () => {
     };
 
     useEffect(() => {
-        getAllPlaylistNames();
-    }, []);
+        if (_id) {
+            getAllPlaylistNames();
+        }
+    }, [_id]);
 
     useEffect(() => {
         if (selectedFile) {

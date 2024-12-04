@@ -13,12 +13,14 @@ import { faAngleRight } from "@fortawesome/free-solid-svg-icons/faAngleRight";
 import { expressInstance } from "../helpers/axios";
 import { getStored_id, logout } from "../helpers/authStorage";
 import { Artist } from "./Search";
+import { useSoundStore } from "../hooks/useSoundStore";
 
 const ProfilePage = ({ navigation }) => {
     const [playlists, setPlaylists] = useState([]);
     const [user, setUser] = useState<Artist>();
     const [_id, set_id] = useState(null);
     const [isArtist, setIsArtist] = useState(false);
+    const { pause } = useSoundStore();
 
     const getAllPlaylists = async () => {
         const playlistResponse = await expressInstance.get(
@@ -70,6 +72,7 @@ const ProfilePage = ({ navigation }) => {
 
     const handleLogout = async () => {
         await logout();
+        await pause();
         navigation.navigate("Login", { isRegister: false });
     };
 
