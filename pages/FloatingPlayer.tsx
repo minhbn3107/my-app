@@ -41,7 +41,7 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
                 />
                 <View style={styles.trackTitleContainer}>
                     {activeTrack.title?.length &&
-                    activeTrack.title?.length > 25 ? (
+                    activeTrack.title?.length > 20 ? (
                         <Marquee spacing={150} speed={1}>
                             <Text style={styles.trackTitle}>
                                 {activeTrack.title}
