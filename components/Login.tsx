@@ -22,13 +22,15 @@ if (
     UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const Login = () => {
+const Login = ({ route }) => {
     const [username, setUsername] = useState("spiderman");
     const [displayName, setDisplayName] = useState("");
     const [password, setPassword] = useState("nomay");
-    const [isRegister, setIsRegister] = useState(false);
-    const navigation = useNavigation();
+    const [isRegister, setIsRegister] = useState(
+        route.params.isRegister || false
+    );
 
+    const navigation = useNavigation();
     useEffect(() => {
         const verifyLoginStatus = async () => {
             const isLoggedIn = await checkLoginStatus();
@@ -63,13 +65,11 @@ const Login = () => {
 
                 navigation.navigate("Home" as never);
             } else {
-                Alert.alert(
-                    "Thông báo",
-                    isRegister
-                        ? "All fields are required"
-                        : "Username or Password is incorrect"
-                );
+                setIsRegister(false);
             }
+            setDisplayName("");
+            setPassword("");
+            setUsername("");
         } catch (error) {
             Alert.alert("Error", "Something went wrong. Please try again.");
         }
@@ -78,6 +78,9 @@ const Login = () => {
     const toggleForm = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setIsRegister(!isRegister);
+        setDisplayName("");
+        setPassword("");
+        setUsername("");
     };
 
     return (

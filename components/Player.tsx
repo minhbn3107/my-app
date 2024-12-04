@@ -5,12 +5,7 @@ import { PlayerRepeatToggle } from "../pages/PlayerRepeatToggle";
 import { PlayerVolumeBar } from "../pages/PlayerVolumeBar";
 import { SwipeablePlayerScreen } from "../pages/SwipeablePlayerScreen";
 // import { usePlayerBackground } from "@/hooks/usePlayerBackground";
-import {
-    FontAwesome,
-    AntDesign,
-    MaterialCommunityIcons,
-    Feather,
-} from "@expo/vector-icons";
+import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import {
     ActivityIndicator,
@@ -181,28 +176,30 @@ const Player = () => {
                                                     alignItems: "center",
                                                 }}
                                             >
-                                                <TouchableOpacity
-                                                    onPress={
-                                                        handleToggleFavorite
-                                                    }
-                                                >
-                                                    <FontAwesome
-                                                        name={
-                                                            isFavorite
-                                                                ? "heart"
-                                                                : "heart-o"
+                                                {_id !== activeTrack.artist && (
+                                                    <TouchableOpacity
+                                                        onPress={
+                                                            handleToggleFavorite
                                                         }
-                                                        size={25}
-                                                        color={
-                                                            isFavorite
-                                                                ? "#fe2c55"
-                                                                : "#fff"
-                                                        }
-                                                        style={{
-                                                            marginHorizontal: 14,
-                                                        }}
-                                                    />
-                                                </TouchableOpacity>
+                                                    >
+                                                        <FontAwesome
+                                                            name={
+                                                                isFavorite
+                                                                    ? "heart"
+                                                                    : "heart-o"
+                                                            }
+                                                            size={25}
+                                                            color={
+                                                                isFavorite
+                                                                    ? "#fe2c55"
+                                                                    : "#fff"
+                                                            }
+                                                            style={{
+                                                                marginHorizontal: 14,
+                                                            }}
+                                                        />
+                                                    </TouchableOpacity>
+                                                )}
                                                 <PlayerRepeatToggle size={30} />
                                             </View>
                                         </View>
@@ -224,7 +221,10 @@ const Player = () => {
                                     )}
                                 </View>
                                 <PlayerProgressBar style={{ marginTop: 32 }} />
-                                <PlayerControls style={{ marginTop: 40 }} />
+                                <PlayerControls
+                                    style={{ marginTop: 40 }}
+                                    track={activeTrack}
+                                />
                             </View>
                             <PlayerVolumeBar
                                 style={{ marginTop: "auto", marginBottom: 80 }}

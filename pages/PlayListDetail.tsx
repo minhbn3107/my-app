@@ -142,9 +142,7 @@ const PlayListDetail = ({ route, navigation }) => {
                             onPress={handleToggleFollow}
                         >
                             <Text style={styles.followButtonText}>
-                                {isFollowing
-                                    ? "Added to Playlist"
-                                    : "Add to Playlist"}
+                                {isFollowing ? "Followed" : "Follow"}
                             </Text>
                         </TouchableOpacity>
                     )}

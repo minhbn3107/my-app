@@ -37,7 +37,7 @@ const Upload = () => {
     const [isCreatingNewPlaylist, setIsCreatingNewPlaylist] = useState(false);
     const [playlistName, setPlaylistName] = useState<string>("");
     const [existingPlaylists, setExistingPlaylists] = useState<string[]>([]);
-    const [isPublic, setIsPublic] = useState<boolean>(false);
+    const [isPublic, setIsPublic] = useState<boolean>(true);
     const [playlistArtwork, setPlaylistArtwork] = useState<SelectedFile | null>(
         null
     );

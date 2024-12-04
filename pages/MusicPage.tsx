@@ -80,12 +80,14 @@ const MusicPage = () => {
                 <View style={styles.trackSection}>
                     <View style={styles.footer}>
                         <Text style={styles.sectionTitle}>Uploaded Song</Text>
-                        <TouchableOpacity
-                            style={styles.seeAllButton}
-                            onPress={toggleView}
-                        >
-                            <Text style={styles.seeAllText}>{view}</Text>
-                        </TouchableOpacity>
+                        {trackData.length > 0 && (
+                            <TouchableOpacity
+                                style={styles.seeAllButton}
+                                onPress={toggleView}
+                            >
+                                <Text style={styles.seeAllText}>{view}</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                     {trackData.slice(0, limit).map((item) => (
                         <TouchableOpacity
@@ -105,7 +107,7 @@ const MusicPage = () => {
                                     {formatDate(item.createdAt)}
                                 </Text>
                             </View>
-                            <ThreeDotsButton color="#000" />
+                            <ThreeDotsButton color="#000" track={item} />
                         </TouchableOpacity>
                     ))}
                 </View>

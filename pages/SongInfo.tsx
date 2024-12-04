@@ -391,6 +391,8 @@ const SongInfo: React.FC<SongInfoProps> = ({
                         <Switch
                             value={isPublic}
                             onValueChange={() => setIsPublic(!isPublic)}
+                            trackColor={{ false: "#e0e0e0", true: "#6B39F4" }}
+                            thumbColor={isPublic ? "#ffffff" : "#f4f3f4"}
                         />
                         <Text style={styles.aiColor}>Make Public</Text>
                     </View>
@@ -404,7 +406,9 @@ const SongInfo: React.FC<SongInfoProps> = ({
                     ]}
                     onPress={() => setIsCreatingNewPlaylist(false)}
                 >
-                    <Text>Choose Existing Playlist</Text>
+                    <Text style={styles.radioText}>
+                        Choose Existing Playlist
+                    </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[
@@ -416,7 +420,7 @@ const SongInfo: React.FC<SongInfoProps> = ({
                         setPlaylistName("");
                     }}
                 >
-                    <Text>Create New Playlist</Text>
+                    <Text style={styles.radioText}>Create New Playlist</Text>
                 </TouchableOpacity>
             </View>
             {!isCreatingNewPlaylist ? (
@@ -598,6 +602,9 @@ const styles = StyleSheet.create({
     },
     radioSelected: {
         borderColor: "#6B39F4",
+    },
+    radioText: {
+        fontSize: 12,
     },
     checkboxGroup: {
         flexDirection: "row",

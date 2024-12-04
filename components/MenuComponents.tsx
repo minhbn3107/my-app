@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import HomePage from "../pages/HomePage";
@@ -11,6 +11,8 @@ import { faHome } from "@fortawesome/free-solid-svg-icons/faHome";
 import { faHeadphones } from "@fortawesome/free-solid-svg-icons/faHeadphones";
 import { faUser } from "@fortawesome/free-solid-svg-icons/faUser";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { getStored_id } from "../helpers/authStorage";
+import { expressInstance } from "../helpers/axios";
 
 type MenuTab = {
     key: string;
@@ -42,7 +44,31 @@ const MenuComponent = ({ navigation }) => {
         },
     ];
 
+    const [_id, set_id] = useState<string | null>(null);
+    const [user, setUser] = useState<any | null>(null);
+    const [isArtist, setIsArtist] = useState(false);
     const [currentScreen, setCurrentScreen] = useState<string>("Home");
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const stored_id = await getStored_id();
+                if (stored_id) {
+                    set_id(stored_id);
+                    const response = await expressInstance.get(
+                        `/api/users/${stored_id}`
+                    );
+                    const fetchedUser = response.data;
+                    setUser(fetchedUser);
+                    setIsArtist(fetchedUser?.isArtist || false);
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data", error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     const renderScreen = () => {
         switch (currentScreen) {
@@ -68,36 +94,41 @@ const MenuComponent = ({ navigation }) => {
             <View style={styles.mainView}>{renderScreen()}</View>
             <View style={styles.boxMenu}>
                 <View style={styles.bottomTab}>
-                    {ARRAY_LIST_MENU.map((tab) => (
-                        <TouchableOpacity
-                            key={tab.key}
-                            onPress={() => handleTabPress(tab.key)}
-                            style={[
-                                styles.tabItem,
-                                currentScreen === tab.key &&
-                                    styles.activeTabItem,
-                            ]}
-                        >
-                            <FontAwesomeIcon
-                                icon={tab.icon}
-                                style={
-                                    currentScreen === tab.key
-                                        ? styles.activeTabIcon
-                                        : styles.styleIcon
-                                }
-                                size={24}
-                            />
-                            <Text
+                    {ARRAY_LIST_MENU.map((tab, index) => {
+                        if (index == 2 && !isArtist) {
+                            return;
+                        }
+                        return (
+                            <TouchableOpacity
+                                key={tab.key}
+                                onPress={() => handleTabPress(tab.key)}
                                 style={[
-                                    styles.tabText,
+                                    styles.tabItem,
                                     currentScreen === tab.key &&
-                                        styles.activeTabText,
+                                        styles.activeTabItem,
                                 ]}
                             >
-                                {tab.label}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
+                                <FontAwesomeIcon
+                                    icon={tab.icon}
+                                    style={
+                                        currentScreen === tab.key
+                                            ? styles.activeTabIcon
+                                            : styles.styleIcon
+                                    }
+                                    size={24}
+                                />
+                                <Text
+                                    style={[
+                                        styles.tabText,
+                                        currentScreen === tab.key &&
+                                            styles.activeTabText,
+                                    ]}
+                                >
+                                    {tab.label}
+                                </Text>
+                            </TouchableOpacity>
+                        );
+                    })}
                 </View>
             </View>
         </>

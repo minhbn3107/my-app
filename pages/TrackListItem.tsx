@@ -78,7 +78,7 @@ export const TrackListItem = ({
                         style={styles.trackPausedIndicator}
                         name="play"
                         size={24}
-                        color="#1ce5ff"
+                        color="#6B39F4"
                     />
                 )}
             </View>
@@ -88,7 +88,7 @@ export const TrackListItem = ({
                         numberOfLines={1}
                         style={{
                             ...styles.trackTitleText,
-                            color: isActiveTrack ? "#1ce5ff" : "#000",
+                            color: isActiveTrack ? "#6B39F4" : "#000",
                         }}
                     >
                         {track.title}
@@ -98,14 +98,14 @@ export const TrackListItem = ({
                             numberOfLines={1}
                             style={{
                                 ...styles.trackArtistText,
-                                color: isActiveTrack ? "#1ce5ff" : "#000",
+                                color: isActiveTrack ? "#6B39F4" : "#000",
                             }}
                         >
                             {track.artistName}
                         </Text>
                     )}
                 </View>
-                <ThreeDotsButton color="#000" />
+                <ThreeDotsButton color="#000" track={track} />
             </View>
         </AnimatedPressable>
     );

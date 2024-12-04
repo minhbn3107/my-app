@@ -10,6 +10,7 @@ import ArtistDetail from "./pages/ArtistDetail";
 import MyPlayList from "./pages/MyPlayList";
 import PlayListDetail from "./pages/PlayListDetail";
 import SongDetail from "./pages/SongDetail";
+import LaunchScreen from "./pages/LaunchScreen";
 
 const Stack = createStackNavigator();
 
@@ -18,12 +19,17 @@ export default function App() {
         <NavigationContainer>
             <GestureHandlerRootView style={styles.container}>
                 <Stack.Navigator
-                    initialRouteName="Login"
+                    initialRouteName="LaunchScreen"
                     screenOptions={{
                         cardStyle: { backgroundColor: "transparent" },
                         cardOverlayEnabled: true,
                     }}
                 >
+                    <Stack.Screen
+                        name="LaunchScreen"
+                        component={LaunchScreen}
+                        options={{ headerShown: false }}
+                    />
                     <Stack.Screen
                         name="Login"
                         component={Login}
@@ -59,7 +65,7 @@ export default function App() {
                         }}
                     />
                     <Stack.Screen
-                        name="Song Detail"
+                        name="SongDetail"
                         component={SongDetail}
                         options={{
                             headerShown: true,

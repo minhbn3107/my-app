@@ -19,7 +19,7 @@ interface SearchResults {
     };
 }
 
-interface Playlist {
+export interface Playlist {
     _id: string;
     title: string;
     isPublic: boolean;
@@ -43,13 +43,14 @@ interface SongReference {
     _id: string;
 }
 
-interface Artist {
+export interface Artist {
     _id: string;
     username: string;
     imageURL: string;
     password: string;
     displayName: string;
     isArtist: boolean;
+    followers: string[];
     likedSongs: string[];
     myPlaylists: string[];
     __v: number;

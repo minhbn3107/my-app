@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -8,81 +8,117 @@ import {
     Switch,
     ScrollView,
 } from "react-native";
-
-
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-
 import { faAngleRight } from "@fortawesome/free-solid-svg-icons/faAngleRight";
-
 import { expressInstance } from "../helpers/axios";
-
-
-
-const songData = {
-    url: "https://example.com/song.mp3",
-    title: "Song Title",
-    mainVoiceGender: "male",
-    language: ["English", "Spanish"],
-    genre: ["Pop", "Rock"],
-    artistName: "John Doe",
-    artwork: "https://i.ibb.co/4MHWXDR/1.jpg",
-    playlists: [
-        { playlistId: "1", playlistName: "Favorites" },
-        { playlistId: "2", playlistName: "Workout" },
-    ],
-    likes: 120,
-    createdAt: "2024-12-01T00:00:00.000Z",
-};
-
-
-
+import { getStored_id, logout } from "../helpers/authStorage";
+import { Artist } from "./Search";
 
 const ProfilePage = ({ navigation }) => {
     const [playlists, setPlaylists] = useState([]);
+    const [user, setUser] = useState<Artist>();
+    const [_id, set_id] = useState(null);
+    const [isArtist, setIsArtist] = useState(false);
 
     const getAllPlaylists = async () => {
-        const playlistResponse = await expressInstance.get("/api/playlists");
+        const playlistResponse = await expressInstance.get(
+            `/api/playlists/artist/${_id}`
+        );
         setPlaylists(playlistResponse.data.playlists);
     };
 
+    const fetchUser_id = async () => {
+        try {
+            const stored_id = await getStored_id();
+            set_id(stored_id);
+        } catch (error) {
+            console.error("Failed to fetch user ID", error);
+        }
+    };
+
+    const getUserInfo = async () => {
+        try {
+            const userInfo = await expressInstance.get(`/api/users/${_id}`);
+            setUser(userInfo.data);
+            setIsArtist(userInfo.data.isArtist);
+        } catch (error) {
+            console.error("Failed to fetch user info", error);
+        }
+    };
+
+    const handleArtistToggle = async () => {
+        try {
+            await expressInstance.patch("/api/users", {
+                id: _id,
+            });
+            setIsArtist((prevState) => !prevState);
+        } catch (error) {
+            console.error("Failed to update artist status", error);
+        }
+    };
+
     useEffect(() => {
-        getAllPlaylists();
+        fetchUser_id();
     }, []);
+
+    useEffect(() => {
+        if (_id) {
+            getUserInfo();
+            getAllPlaylists();
+        }
+    }, [_id]);
+
+    const handleLogout = async () => {
+        await logout();
+        navigation.navigate("Login", { isRegister: false });
+    };
 
     return (
         <ScrollView style={styles.container}>
             <View style={{ paddingBottom: 100 }}>
                 <View style={styles.profileSection}>
-                    <View>
-                        <Image
-                            source={{ uri: "https://i.ibb.co/sVqS2Sd/4.jpg" }}
-                            style={styles.avatar}
+                    {user && (
+                        <View>
+                            <Image
+                                source={{ uri: user.imageURL }}
+                                style={styles.avatar}
+                            />
+                            <Text style={styles.name}>{user.displayName}</Text>
+                            <Text style={styles.email}>@{user.username}</Text>
+                        </View>
+                    )}
+
+                    <View
+                        style={{
+                            justifyContent: "center",
+                            alignItems: "center",
+                            paddingRight: 15,
+                        }}
+                    >
+                        <Text style={{ fontSize: 16 }}>Followers</Text>
+                        <Text style={{ fontWeight: "700", fontSize: 19 }}>
+                            {user?.followers.length}
+                        </Text>
+                    </View>
+                    <View style={styles.artistSwitchContainer}>
+                        <View style={styles.artistSwitchTextContainer}>
+                            <Text style={styles.artistSwitchTitle}>
+                                Artist Mode
+                            </Text>
+                            <Text style={styles.artistSwitchSubtitle}>
+                                Enable artist features
+                            </Text>
+                        </View>
+                        <Switch
+                            value={isArtist}
+                            onValueChange={handleArtistToggle}
+                            trackColor={{ false: "#e0e0e0", true: "#6B39F4" }}
+                            thumbColor={isArtist ? "#ffffff" : "#f4f3f4"}
                         />
-                        <Text style={styles.name}>NGUYEN PHONG</Text>
-                        <Text style={styles.email}>@phong5555</Text>
-                    </View>
-                    <View style={{ justifyContent: "center", alignItems: "center" }}>
-                        <Text style={{ fontSize: 16 }}>Following</Text>
-                        <Text style={{ fontWeight: "700", fontSize: 19 }}>12</Text>
-                    </View>
-                    <View style={{ justifyContent: "center", alignItems: "center", paddingRight: 15 }}>
-                        <Text style={{ fontSize: 16 }}>Follower</Text>
-                        <Text style={{ fontWeight: "700", fontSize: 19 }}>45</Text>
                     </View>
                 </View>
-
-                <TouchableOpacity
-                    style={styles.itemRP}
-                    onPress={() => {
-                        navigation.navigate("Song Detail", { song: songData });
-                    }}
-                >
-                    <Text>demo song detail</Text>
-                </TouchableOpacity>
-
-
                 <View
-                    style={{ marginTop: 15, marginBottom: 50, paddingRight: 5 }}
+                    style={{ marginTop: 15, marginBottom: 20, paddingRight: 5 }}
                 >
                     <View
                         style={{
@@ -91,7 +127,6 @@ const ProfilePage = ({ navigation }) => {
                         }}
                     >
                         <Text style={styles.text_heading}>My Playlists</Text>
-
                     </View>
                     {playlists.map((item) => (
                         <View style={styles.lineRP} key={item._id}>
@@ -141,20 +176,17 @@ const ProfilePage = ({ navigation }) => {
                         </View>
                     ))}
                 </View>
-
-
-                {/* Preferences Section */}
                 <View style={styles.section}>
-
                     <View style={styles.item}>
                         <TouchableOpacity
                             style={styles.logoutButton}
-                            onPress={() => navigation.navigate("Login")}
+                            onPress={handleLogout}
                         >
-                            <Text style={styles.logoutText}>LOGOUT</Text>
+                            <Text style={styles.logoutText}>LOG OUT</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
+                <View style={{ height: 60 }}></View>
             </View>
         </ScrollView>
     );
@@ -164,18 +196,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        padding: 10
+        padding: 10,
     },
     profileSection: {
         width: "100%",
-        // alignItems: "center",
-        // marginBottom: 20,
         padding: 12,
         flexDirection: "row",
-        justifyContent: "space-between",
+        gap: 10,
         borderColor: "#e2e2e2",
         borderWidth: 1,
-        borderRadius: 11
+        borderRadius: 11,
     },
     avatar: {
         width: 80,
@@ -184,12 +214,14 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     name: {
-        fontSize: 11,
+        fontSize: 15,
         fontWeight: "bold",
+        textAlign: "center",
     },
     email: {
         color: "#888",
         marginBottom: 10,
+        textAlign: "center",
     },
     editProfileButton: {
         backgroundColor: "#000",
@@ -241,9 +273,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "bold",
     },
-
-
-
 
     text_heading: {
         fontSize: 20,
@@ -323,6 +352,30 @@ const styles = StyleSheet.create({
     songCount: {
         fontSize: 12,
         color: "#999",
+    },
+    artistSwitchContainer: {
+        flex: 1,
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: "#ffffff",
+        padding: 15,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "#e0e0e0",
+    },
+    artistSwitchTextContainer: {
+        flex: 1,
+        marginRight: 15,
+    },
+    artistSwitchTitle: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#000",
+    },
+    artistSwitchSubtitle: {
+        fontSize: 13,
+        color: "#666",
+        marginTop: 4,
     },
 });
 

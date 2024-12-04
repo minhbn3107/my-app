@@ -1,4 +1,4 @@
-import { useSoundStore } from "../hooks/useSoundStore";
+import { Track, useSoundStore } from "../hooks/useSoundStore";
 import {
     FontAwesome6,
     FontAwesome,
@@ -6,15 +6,21 @@ import {
     MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 type PlayerControlsProps = {
     style?: ViewStyle;
+    track?: Track;
 };
 type PlayerButtonProps = {
     style?: ViewStyle;
     iconSize?: number;
     color?: string;
+    track?: Track;
 };
-export const PlayerControls = ({ style }: PlayerControlsProps) => {
+type RootStackParamList = {
+    SongDetail: { song: Track };
+};
+export const PlayerControls = ({ style, track }: PlayerControlsProps) => {
     return (
         <View style={[styles.container, style]}>
             <View style={styles.row}>
@@ -22,7 +28,7 @@ export const PlayerControls = ({ style }: PlayerControlsProps) => {
                 <SkipToPreviousButton />
                 <PlayPauseButton />
                 <SkipToNextButton />
-                <ThreeDotsButton />
+                <ThreeDotsButton track={track} />
             </View>
         </View>
     );
@@ -102,11 +108,14 @@ export const SkipToPreviousButton = ({ iconSize = 30 }: PlayerButtonProps) => {
 export const ThreeDotsButton = ({
     iconSize = 30,
     color = "#fff",
+    track,
 }: PlayerButtonProps) => {
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
     return (
         <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => console.log("three")}
+            onPress={() => navigation.navigate("SongDetail", { song: track })}
         >
             <Entypo
                 name="dots-three-horizontal"

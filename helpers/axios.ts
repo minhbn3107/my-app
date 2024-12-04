@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const EXPRESS_BASE_URL = "http://192.168.1.15:3500";
-const FLASK_BASE_URL = "http://192.168.1.15:8000";
+const EXPRESS_BASE_URL = "http://192.168.1.30:3500";
+const FLASK_BASE_URL = "http://192.168.1.30:8000";
 
 const expressInstance = axios.create({
     baseURL: EXPRESS_BASE_URL,
